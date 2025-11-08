@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crow 🪶 | Home</title>
+</head>
+<body>
+    <h1>Welcome to Crow 🪶</h1>
+    <p>This is your first public page connected to Django!</p>
+
+    <h2>Latest Posts</h2>
+
+    {% for post in posts %}
+        <div>
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.content }}</p>
+            <small>Posted on: {{ post.created_at }}</small>
+            <hr>
+        </div>
+    {% empty %}
+        <p>No posts yet.</p>
+    {% endfor %}
+</body>
+</html>
