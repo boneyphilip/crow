@@ -5,12 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crow 🪶 | Home</title>
 </head>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+    }
+    h1 {
+        color: #333;
+    }
+    .post {
+        background : white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+    form {
+        background: white;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 9px;
+    }
+    input, textarea, button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        padding: 10px;
+    }
+    button {
+        background: black;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    buttorn:hover {
+        background: #333;
+    }
+</style>
+
 <body>
     <h1>Welcome to Crow 🪶</h1>
-    <p>This is your first public page connected to Django!</p>
+    <p>Create your posts below:</p>
+
+    <form method="post">
+        {% csrf_token %}  <!-- Cross-Site Request Forgery protection -->
+        {{ form.as_p }}
+        <button type="submit">Post</button>
+    </form>
 
     <h2>Latest Posts</h2>
-
     {% for post in posts %}
         <div>
             <h3>{{ post.title }}</h3>
