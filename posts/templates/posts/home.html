@@ -1,69 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crow 🪶 | Home</title>
+  <!-- Character encoding and responsive settings -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Page title shown in browser tab -->
+  <title>Crow 🪶 | Home</title>
+
+  <!-- Bootstrap CSS (CDN link) 
+       This imports Bootstrap’s styles so we can use ready-made design classes -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS styling for Crow website -->
+  <style>
+    /* Body: light gray background, some padding */
+    body {
+      background-color: #f8f9fa;
+      padding: 30px;
+    }
+
+    /* Center header and add spacing */
+    .crow-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    /* Make main title bold and dark */
+    .crow-header h1 {
+      font-weight: bold;
+      color: #343a40;
+    }
+
+    /* Style for each post card */
+    .post-card {
+      background: white;
+      border-radius: 10px; /* rounded corners */
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05); /* light shadow */
+    }
+
+    /* Footer style */
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #777;
+    }
+  </style>
 </head>
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 40px;
-    }
-    h1 {
-        color: #333;
-    }
-    .post {
-        background : white;
-        padding: 15px;
-        margin-bottom: 10px;
-        border-radius: 8px;
-    }
-    form {
-        background: white;
-        padding: 20px;
-        margin-bottom: 30px;
-        border-radius: 9px;
-    }
-    input, textarea, button {
-        width: 100%;
-        padding: 10px;
-        margin-top: 8px;
-        padding: 10px;
-    }
-    button {
-        background: black;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    buttorn:hover {
-        background: #333;
-    }
-</style>
-
 <body>
-    <h1>Welcome to Crow 🪶</h1>
-    <p>Create your posts below:</p>
+  <div class="container" style="max-width: 800px;">  <!-- Limit the page width to keep it centered -->
+    
+    <!-- Crow Header -->
+    <div class="crow-header">
+      <h1>Welcome to Crow 🪶</h1>
+      <p class="text-muted">Share your thoughts with the world!</p>
+    </div>
 
-    <form method="post">
-        {% csrf_token %}  <!-- Cross-Site Request Forgery protection -->
-        {{ form.as_p }}
-        <button type="submit">Post</button>
-    </form>
+    <!-- ==================== POST FORM ==================== -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title text-center mb-3">📝 Create a New Post</h5>
 
-    <h2>Latest Posts</h2>
+        <!-- Form Section -->
+        <form method="POST" class="needs-validation">
+          {% csrf_token %}
+          
+          <!-- Title Field -->
+          <div class="mb-3">
+            <label for="id_title" class="form-label fw-bold">Title:</label>
+            {{ form.title }}
+          </div>
+
+          <!-- Content Field -->
+          <div class="mb-3">
+            <label for="id_content" class="form-label fw-bold">Content:</label>
+            {{ form.content }}
+          </div>
+
+          <!-- Submit Button -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-dark px-4">Post</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== LIST OF POSTS ==================== -->
+    <h4 class="mb-3 text-center">Latest Posts</h4>
+
     {% for post in posts %}
-        <div>
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.content }}</p>
-            <small>Posted on: {{ post.created_at }}</small>
-            <hr>
-        </div>
+      <div class="post-card">
+        <h5 class="fw-bold">{{ post.title }}</h5>
+        <p>{{ post.content }}</p>
+      </div>
     {% empty %}
-        <p>No posts yet.</p>
+      <p class="text-muted text-center">No posts yet. Be the first to share!</p>
     {% endfor %}
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer>
+      <p>🪶 Crow — Built with Django + Bootstrap</p>
+    </footer>
+  </div>
 </body>
+
 </html>
