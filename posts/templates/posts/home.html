@@ -1,117 +1,123 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crow 🪶 | Share your thoughts</title>
 
     <!-- 🌐 Linking Bootstrap CSS from CDN (for styling and layout) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
     <style>
-        /* 🎨 Set background and font for entire page */
-        body {
-            background-color: #f8f9fa; /* light gray background */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+      /* 🎨 Set background and font for entire page */
+      body {
+        background-color: #f8f9fa; /* light gray background */
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
 
-        /* 🧱 Main container - centers page and controls max width */
-        .container {
-            max-width: 700px; /* page width */
-            margin-top: 40px; /* space from top */
-        }
+      /* 🧱 Main container - centers page and controls max width */
+      .container {
+        max-width: 700px; /* page width */
+        margin-top: 40px; /* space from top */
+      }
 
-        /* ✍️ Card style for the “Create Post” form */
-        .post-card {
-            background-color: #fff; /* white box */
-            border-radius: 12px;    /* rounded corners */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* soft shadow */
-            padding: 25px;          /* inner spacing */
-            margin-bottom: 30px;    /* space below form */
-        }
+      /* ✍️ Card style for the “Create Post” form */
+      .post-card {
+        background-color: #fff; /* white box */
+        border-radius: 12px; /* rounded corners */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* soft shadow */
+        padding: 25px; /* inner spacing */
+        margin-bottom: 30px; /* space below form */
+      }
 
-        /* 📰 Each post item design */
-        .post-item {
-            background-color: #fff; /* white card for posts */
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
+      /* 📰 Each post item design */
+      .post-item {
+        background-color: #fff; /* white card for posts */
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
 
-        /* ✨ Page and section titles */
-        h1 {
-            font-weight: 700; /* bold */
-            text-align: center;
-            margin-bottom: 10px;
-        }
+      /* ✨ Page and section titles */
+      h1 {
+        font-weight: 700; /* bold */
+        text-align: center;
+        margin-bottom: 10px;
+      }
 
-        h3, h4, h5 {
-            font-weight: 600;
-        }
+      h3,
+      h4,
+      h5 {
+        font-weight: 600;
+      }
 
-        /* 🎯 Style post button */
-        button {
-            width: 120px;
-        }
+      /* 🎯 Style post button */
+      button {
+        width: 120px;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
+    <!-- 📦 Container keeps everything centered and neat -->
+    <div class="container">
+      <!--  Page Header -->
+      <h1>Welcome to <span class="text-primary">Crow</span> 🪶</h1>
+      <p class="text-center text-muted">Share your thoughts with the world!</p>
 
-<!-- 📦 Container keeps everything centered and neat -->
-<div class="container">
-
-    <!-- 🪶 Page Header -->
-    <h1>Welcome to <span class="text-primary">Crow</span> 🪶</h1>
-    <p class="text-center text-muted">Share your thoughts with the world!</p>
-
-    <!-- ✍️ Create Post Form (inside a white card) -->
-    <div class="post-card">
+      <!--  Create Post Form (inside a white card) -->
+      <div class="post-card">
         <h4 class="mb-3 text-center">Create a New Post</h4>
 
-        <!-- 📋 The form starts -->
+        <!--  The form starts -->
         <form method="POST">
-            {% csrf_token %} <!-- 🔒 Protects from CSRF attacks -->
-            
-            <!-- 🧩 Title input -->
-            <div class="mb-3">
-                {{ form.title.label_tag }}  <!-- 🏷 Label = "Title" -->
-                {{ form.title }}            <!-- 📥 Input field -->
-            </div>
+          {% csrf_token %}
+          <!-- Protects from CSRF attacks -->
 
-            <!-- 🧩 Content textarea -->
-            <div class="mb-3">
-                {{ form.content.label_tag }} <!-- 🏷 Label = "Content" -->
-                {{ form.content }}            <!-- 📝 Textarea -->
-            </div>
+          <!--  Title input -->
+          <div class="mb-3">
+            {{ form.title.label_tag }}
+            <!--  Label = "Title" -->
+            {{ form.title }}
+            <!--  Input field -->
+          </div>
 
-            <!-- 🖱 Centered post button -->
-            <div class="text-center">
-                <button type="submit" class="btn btn-dark">Post</button>
-            </div>
+          <!--  Content textarea -->
+          <div class="mb-3">
+            {{ form.content.label_tag }}
+            <!--  Label = "Content" -->
+            {{ form.content }}
+            <!--  Textarea -->
+          </div>
+
+          <!--  Centered post button -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-dark">Post</button>
+          </div>
         </form>
+      </div>
+
+      <!--  Section for displaying all posts -->
+      <h4 class="mb-3 text-center">Latest Posts</h4>
+
+      <!--  Loop through all posts -->
+      {% for post in posts %}
+      <div class="post-item">
+        <!-- 🏷 Post Title -->
+        <h5>{{ post.title }}</h5>
+        <!-- 🗒 Post Content -->
+        <p class="text-muted">{{ post.content }}</p>
+      </div>
+
+      <!--  If no posts exist -->
+      {% empty %}
+      <p class="text-center text-muted">No posts yet. Be the first one!</p>
+      {% endfor %}
     </div>
-
-    <!-- 📰 Section for displaying all posts -->
-    <h4 class="mb-3 text-center">Latest Posts</h4>
-
-    <!-- 🔁 Loop through all posts -->
-    {% for post in posts %}
-        <div class="post-item">
-            <!-- 🏷 Post Title -->
-            <h5>{{ post.title }}</h5>
-            <!-- 🗒 Post Content -->
-            <p class="text-muted">{{ post.content }}</p>
-        </div>
-
-    <!-- 🚫 If no posts exist -->
-    {% empty %}
-        <p class="text-center text-muted">No posts yet. Be the first one!</p>
-    {% endfor %}
-
-</div>
-</body>
+  </body>
 </html>
