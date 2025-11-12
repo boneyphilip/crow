@@ -3,6 +3,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post
 from .forms import PostForm  # Import our new form
+from django.http import JsonResponse  # Needed to send JSON data back to JS
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -16,7 +17,8 @@ def home(request):
     if request.method == "POST":
         form = PostForm(request.POST)  # Bind the form with user input
         if form.is_valid():  # Validate form data
-            post = form.save(commit=False)  # Create a Post object but don’t save yet
+            # Create a Post object but don’t save yet
+            post = form.save(commit=False)
             # Assign author (use logged-in user, fallback to first user)
             post.author = request.user if request.user.is_authenticated else User.objects.first()
             post.created_at = timezone.now()  # Set current time
@@ -46,3 +48,24 @@ def upvote_post(request, post_id):
     post.save()
     # Redirect back to home
     return redirect('home')
+
+
+# -------------------------------------------
+# AJAX upvote view
+# This handles upvotes instantly (no reload)
+# -------------------------------------------
+def ajax_upvote_post(request, post_id):
+    # Allow only POST requests (no GET)
+    if request.method == "POST":
+        # Get the post or return 404 if not found
+        post = get_object_or_404(Post, id=post_id)
+
+        # Increase the upvote count by 1
+        post.upvotes += 1
+        post.save()
+
+        # Return JSON with the new upvote count
+        return JsonResponse({"upvotes": post.upvotes})
+
+    # If someone tries GET, send error message
+    return JsonResponse({"error": "Invalid request"}, status=400)

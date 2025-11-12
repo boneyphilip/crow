@@ -1,117 +1,188 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Crow – Community Feed</title>
 
     <!-- Bootstrap CSS (for responsive design and styles) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
     <style>
-        /* Custom style to make layout closer to Reddit look */
-        body {
-            background-color: #f6f7f8; /* soft gray background */
-            font-family: "Inter", "Segoe UI", Arial, sans-serif;
-        }
+      /* Custom style to make layout closer to Reddit look */
+      body {
+        background-color: #f6f7f8; /* soft gray background */
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      }
 
-        h1 {
-            font-weight: 700;
-            color: #212529;
-        }
+      h1 {
+        font-weight: 700;
+        color: #212529;
+      }
 
-        .card {
-            border-radius: 12px; /* smooth rounded corners */
-            border: 1px solid #e0e0e0;
-        }
+      .card {
+        border-radius: 12px; /* smooth rounded corners */
+        border: 1px solid #e0e0e0;
+      }
 
-        .btn-outline-success {
-            border-radius: 20px; /* rounded button */
-            font-weight: 500;
-        }
+      .btn-outline-success {
+        border-radius: 20px; /* rounded button */
+        font-weight: 500;
+      }
 
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
 
-        .card-subtitle {
-            font-size: 0.9rem;
-        }
+      .card-subtitle {
+        font-size: 0.9rem;
+      }
 
-        .upvote-section {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+      .upvote-section {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
     </style>
-</head>
+  </head>
 
-<body class="bg-light">
+  <body class="bg-light">
+    <!-- Outer container with padding -->
+    <div class="container py-5">
+      <!-- Page Title -->
+      <h1 class="text-center mb-5">Crow 🪶 Community Feed</h1>
 
-<!-- Outer container with padding -->
-<div class="container py-5">
-
-    <!-- Page Title -->
-    <h1 class="text-center mb-5">
-        Crow 🪶 Community Feed
-    </h1>
-
-    <!-- ========================== -->
-    <!-- CREATE POST FORM SECTION -->
-    <!-- ========================== -->
-    <div class="card shadow-sm mb-5">
+      <!-- ========================== -->
+      <!-- CREATE POST FORM SECTION -->
+      <!-- ========================== -->
+      <div class="card shadow-sm mb-5">
         <div class="card-body">
-            <h4 class="card-title mb-3">Create a Post</h4>
+          <h4 class="card-title mb-3">Create a Post</h4>
 
-            <form method="POST" class="mb-4">
-                {% csrf_token %}
-                <!-- Django auto-generated form -->
-                {{ form.as_p }}
+          <form method="POST" class="mb-4">
+            {% csrf_token %}
+            <!-- Django auto-generated form -->
+            {{ form.as_p }}
 
-                <!-- Submit button -->
-                <button type="submit" class="btn btn-primary">Share Post</button>
-            </form>
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary">Share Post</button>
+          </form>
         </div>
+      </div>
+
+      <!-- ========================== -->
+      <!--  SHOW ALL EXISTING POSTS-->
+      <!-- ========================== -->
+      <h3 class="fw-semibold mb-4">Latest Posts</h3>
+
+      {% for post in posts %}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <!-- Post Title -->
+          <h5 class="card-title mb-1">{{ post.title }}</h5>
+
+          <!-- Author and Time -->
+          <h6 class="card-subtitle mb-3 text-muted">
+            by {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i"
+            }}
+          </h6>
+
+          <!-- Post Content -->
+          <p class="card-text">{{ post.content }}</p>
+
+          <!-- Upvote Button (AJAX enabled) -->
+          <form
+            method="post"
+            action="{% url 'upvote_post' post.id %}"
+            class="upvote-section"
+          >
+            {% csrf_token %}
+
+            <!-- This button won't submit the form normally -->
+            <button
+              type="button"
+              class="btn btn-outline-success btn-sm ajax-upvote-btn"
+              data-id="{{ post.id }}"
+            >
+              🔥 Upvote
+            </button>
+
+            <!-- This span shows the upvote count (will update instantly with JS) -->
+            <span id="upvote-count-{{ post.id }}" class="text-secondary">
+              {{ post.upvotes }} upvotes
+            </span>
+          </form>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-muted">No posts yet. Be the first to share something!</p>
+      {% endfor %}
     </div>
 
-    <!-- ========================== -->
-    <!-- POSTS LIST SECTION -->
-    <!-- ========================== -->
-    <h3 class="fw-semibold mb-4">Latest Posts</h3>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    {% for post in posts %}
-        <div class="card mb-4 shadow-sm">
-            <div class="card-body">
+    <!-- ======================================== -->
+    <!-- AJAX Script for Live Upvoting (No Reload) -->
+    <!-- ======================================== -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Step 1: Find all upvote buttons on the page
+        const upvoteButtons = document.querySelectorAll(".ajax-upvote-btn");
 
-                <!-- Post Title -->
-                <h5 class="card-title mb-1">{{ post.title }}</h5>
+        // Step 2: Add a click event listener to each button
+        upvoteButtons.forEach((button) => {
+          button.addEventListener("click", function (event) {
+            event.preventDefault(); // Prevent page refresh when clicked
 
-                <!-- Author and Time -->
-                <h6 class="card-subtitle mb-3 text-muted">
-                    by {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i" }}
-                </h6>
+            const postId = this.dataset.id; //  Get post ID from the button
+            const counter = document.getElementById(`upvote-count-${postId}`); // Find where to update the number
 
-                <!-- Post Content -->
-                <p class="card-text">{{ post.content }}</p>
+            // Step 3: Send AJAX POST request to Django backend
+            fetch(`/ajax/upvote/${postId}/`, {
+              method: "POST",
+              headers: {
+                "X-CSRFToken": getCookie("csrftoken"), // Include CSRF token(Django requirement)
+              },
+            })
+              // Step 4: When server replies, get the new number
+              .then((response) => response.json())
+              .then((data) => {
+                // Step 5: If response contains new upvote count, update instantly
+                if (data.upvotes) {
+                  counter.textContent = data.upvotes + " upvotes";
+                }
+              })
+              // If something goes wrong, print error in console
+              .catch((error) => console.error("Error:", error));
+          });
+        });
 
-                <!-- Upvote Button -->
-                <form action="{% url 'upvote_post' post.id %}" method="post" class="upvote-section">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-success btn-sm">
-                        🔥 Upvote
-                    </button>
-                    <span class="text-secondary">{{ post.upvotes }} upvotes</span>
-                </form>
-
-            </div>
-        </div>
-    {% empty %}
-        <p class="text-muted">No posts yet. Be the first to share something!</p>
-    {% endfor %}
-</div>
-
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+        // -----------------------------------------
+        // Helper Function to Read CSRF Token Cookie
+        // (Django requires CSRF for all POST requests)
+        // -----------------------------------------
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(
+                  cookie.substring(name.length + 1)
+                );
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+      });
+    </script>
+  </body>
 </html>
