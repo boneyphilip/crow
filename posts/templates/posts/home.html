@@ -1,107 +1,117 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crow - Home</title>
+    <title>Crow – Community Feed</title>
 
-    <!-- Bootstrap CSS for styling -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS (for responsive design and styles) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        /* Basic background color for the entire page */
-        body { background: #f5f6f7; }
-
-        /* Style for each post box (card look) */
-        .post-card {
-            background: white;                 /* white background for readability */
-            border-radius: 10px;               /* rounded corners */
-            padding: 20px;                     /* inner spacing */
-            margin-bottom: 15px;               /* space between posts */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* light shadow for depth */
+        /* Custom style to make layout closer to Reddit look */
+        body {
+            background-color: #f6f7f8; /* soft gray background */
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
         }
 
-        /* Style for small text showing author and timestamp */
-        .post-meta {
-            color: #777;                       /* light gray text color */
-            font-size: 0.9rem;                 /* smaller font size */
+        h1 {
+            font-weight: 700;
+            color: #212529;
         }
 
-        /* Style for the upvote button */
-        .upvote-btn {
-            background: none;                  /* remove background */
-            border: none;                      /* remove border */
-            color: #ff4500;                    /* orange color for upvote */
-            font-weight: bold;                 /* make text bold */
-            cursor: pointer;                   /* show hand cursor on hover */
+        .card {
+            border-radius: 12px; /* smooth rounded corners */
+            border: 1px solid #e0e0e0;
         }
 
-        /* Centering and spacing for the page header */
-        h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
+        .btn-outline-success {
+            border-radius: 20px; /* rounded button */
+            font-weight: 500;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+        }
+
+        .upvote-section {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
     </style>
 </head>
 
-<body class="container py-4">
+<body class="bg-light">
+
+<!-- Outer container with padding -->
+<div class="container py-5">
+
     <!-- Page Title -->
-    <h2>Welcome to Crow</h2>
+    <h1 class="text-center mb-5">
+        Crow 🪶 Community Feed
+    </h1>
 
-    <!-- ========================= -->
-    <!-- Post Creation Form Section -->
-    <!-- ========================= -->
-    <div class="card p-3 mb-4">
-        <h5>Create a New Post</h5>
+    <!-- ========================== -->
+    <!-- CREATE POST FORM SECTION -->
+    <!-- ========================== -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h4 class="card-title mb-3">Create a Post</h4>
 
-        <!-- Form for submitting a new post -->
-        <form method="POST">
-            {% csrf_token %}  <!-- Django security token to prevent CSRF attacks -->
+            <form method="POST" class="mb-4">
+                {% csrf_token %}
+                <!-- Django auto-generated form -->
+                {{ form.as_p }}
 
-            <!-- Title input field -->
-            <input type="text" name="title" class="form-control mb-2" placeholder="Title" required>
-
-            <!-- Content text area -->
-            <textarea name="content" class="form-control mb-2" placeholder="What's on your mind?" rows="4" required></textarea>
-
-            <!-- Submit button -->
-            <button type="submit" class="btn btn-primary w-100">Post</button>
-        </form>
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary">Share Post</button>
+            </form>
+        </div>
     </div>
 
-    <!-- ========================= -->
-    <!-- Posts Display Section -->
-    <!-- ========================= -->
-    <h4 class="mb-3">Latest Posts</h4>
+    <!-- ========================== -->
+    <!-- POSTS LIST SECTION -->
+    <!-- ========================== -->
+    <h3 class="fw-semibold mb-4">Latest Posts</h3>
 
-    <!-- Django loop to display all posts -->
     {% for post in posts %}
-        <div class="post-card">
-            <!-- Post title -->
-            <h5>{{ post.title }}</h5>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
 
-            <!-- Post content -->
-            <p>{{ post.content }}</p>
+                <!-- Post Title -->
+                <h5 class="card-title mb-1">{{ post.title }}</h5>
 
-            <!-- Author name, timestamp, and upvote button -->
-            <div class="d-flex justify-content-between align-items-center">
-                <!-- Display author name and created date -->
-                <small class="post-meta">
-                    By <strong>{{ post.author.username }}</strong> |
-                    {{ post.created_at|date:"M d, Y H:i" }}
-                </small>
+                <!-- Author and Time -->
+                <h6 class="card-subtitle mb-3 text-muted">
+                    by {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i" }}
+                </h6>
 
-                <!-- Form for upvoting a post -->
-                <form method="POST" action="{% url 'upvote_post' post.id %}">
+                <!-- Post Content -->
+                <p class="card-text">{{ post.content }}</p>
+
+                <!-- Upvote Button -->
+                <form action="{% url 'upvote_post' post.id %}" method="post" class="upvote-section">
                     {% csrf_token %}
-                    <!-- Upvote button with current count -->
-                    <button type="submit" class="upvote-btn">⬆ {{ post.upvotes }}</button>
+                    <button type="submit" class="btn btn-outline-success btn-sm">
+                        🔥 Upvote
+                    </button>
+                    <span class="text-secondary">{{ post.upvotes }} upvotes</span>
                 </form>
+
             </div>
         </div>
-
-    <!-- Message if there are no posts -->
     {% empty %}
-        <p>No posts yet.</p>
+        <p class="text-muted">No posts yet. Be the first to share something!</p>
     {% endfor %}
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

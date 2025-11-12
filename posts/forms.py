@@ -1,21 +1,25 @@
+
 from django import forms
 from .models import Post
 
-# Custom Django form for Post model
+# This class defines how the Post form looks and works.
+# It connects directly to the Post model.
+
+
 class PostForm(forms.ModelForm):
     class Meta:
-        model = Post  # Connect to Post model
-        fields = ['title', 'content']  # Fields visible on the form
+        model = Post  # Link this form to the Post model
+        fields = ['title', 'content']  # Fields that appear in the form
 
-        # Add Bootstrap styling to each field
+        # Optional: Add placeholder text and basic CSS styling
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control',  # Bootstrap style
-                'placeholder': 'Enter your post title here...'
+                'class': 'form-control',
+                'placeholder': 'Enter a catchy title...'
             }),
             'content': forms.Textarea(attrs={
-                'class': 'form-control',  # Bootstrap textarea style
-                'rows': 5,
-                'placeholder': 'Write your thoughts here...'
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Share your thoughts...'
             }),
         }
