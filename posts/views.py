@@ -6,11 +6,11 @@ from .forms import PostForm  # Import our new form
 from django.http import JsonResponse  # Needed to send JSON data back to JS
 from django.contrib.auth.models import User
 from django.utils import timezone
-
+from django.contrib import messages  # Import Django messages framework
 
 # -----------------------------
 # Home page view
-# Shows all posts + handles new post form
+# Handles post creation + shows posts + adds success messages
 # -----------------------------
 def home(request):
     # If user submitted the form (POST request)
@@ -22,41 +22,46 @@ def home(request):
             # Assign author (use logged-in user, fallback to first user)
             post.author = request.user if request.user.is_authenticated else User.objects.first()
             post.created_at = timezone.now()  # Set the current time as creation time
-           
-             # -----------------------------
+
+            # -----------------------------
             # SMART CATEGORY CREATION LOGIC
             # -----------------------------
-            # Get the category name from the form (either dropdown or search box)
-            category_input = request.POST.get('category_name') or request.POST.get('category')
+            # Extract category name from the form
+            category_name = request.POST.get('category_name')
 
-            # If the user typed or selected a category
-            if category_input:
-                # Try to find existing category (case insensitive)
-                # If not found, create a new one automatically
-                category_obj, created = Category.objects.get_or_create(
-                    name__iexact=category_input,  # Search ignoring case
-                    defaults={'name': category_input}  # If not found, create with this name
-                )
+            # If user entered a category
+            if category_name:
+                # Try to find it in database, or create a new one if not found
+                category, created = Category.objects.get_or_create(
+                    name=category_name)
 
-                # Attach that category object to the post
-                post.category = category_obj
+                # If category was newly created, show success message
+                if created:
+                    messages.success(
+                        request, f"New category '{category_name}' created!")
+
+                # Assign the category to the post
+                post.category = category
 
             # Save post to database
             post.save()
 
-            # After saving, reload page to clear form and show new post
+            # Show a success message for post creation
+            messages.success(
+                request, "Your post has been shared successfully!")
+
+            # Redirect back to home to avoid form resubmission
             return redirect('home')
 
     else:
-        # If the user just opened the page (GET request), show an empty form
+        # If just viewing the page, show empty form
         form = PostForm()
 
     # Fetch all posts from newest to oldest
     posts = Post.objects.all().order_by('-created_at')
 
-    # Pass both form and posts to the HTML template
+    # Pass data to the template
     return render(request, 'posts/home.html', {'form': form, 'posts': posts})
-
 
 
 # -----------------------------
