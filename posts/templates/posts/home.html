@@ -65,8 +65,24 @@
 
           <form method="POST" class="mb-4">
             {% csrf_token %}
-            <!-- Django auto-generated form -->
-            {{ form.as_p }}
+
+            <!-- Category Field -->
+            <div class="mb-3">
+              {{ form.category.label_tag }}
+               {{ form.category }}
+            </div>
+
+            <!-- Title Field -->
+            <div class="mb-3">
+              {{ form.title.label_tag }}
+               {{ form.title }}
+            </div>
+
+            <!-- Content Field -->
+            <div class="mb-3">
+              {{ form.content.label_tag }}
+               {{ form.content }}
+            </div>
 
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary">Share Post</button>
