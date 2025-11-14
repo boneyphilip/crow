@@ -69,3 +69,25 @@ def ajax_upvote_post(request, post_id):
 
     # If someone tries GET, send error message
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+# -------------------------------------------
+# Category Search API (AJAX)
+# -------------------------------------------
+# This function will return matching categories as JSON
+# Example: /categories/search/?q=tech  → returns ["Technology", "Tech News"]
+
+from django.http import JsonResponse  # make sure this is imported at the top
+from .models import Category  # already imported earlier, but double-check
+
+def search_categories(request):
+    # Get the search query from URL (example: ?q=tech)
+    query = request.GET.get('q', '')
+
+    # Filter categories whose name contains the query text (case insensitive)
+    categories = Category.objects.filter(name__icontains=query)
+
+    # Convert queryset into a list of category names
+    results = list(categories.values_list('name', flat=True))
+
+    # Return the result as JSON data
+    return JsonResponse({'results': results})

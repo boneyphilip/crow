@@ -12,4 +12,7 @@ urlpatterns = [
     # AJAX upvote URL — will be called by JavaScript
     path('ajax/upvote/<int:post_id>/',
          views.ajax_upvote_post, name='ajax_upvote_post'),
+    
+    # NEW: Category Search API
+    path('categories/search/', views.search_categories, name='search_categories'),
 ]
