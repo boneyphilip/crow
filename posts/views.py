@@ -112,8 +112,15 @@ def search_categories(request):
     # Find categories containing that text (case insensitive)
     categories = Category.objects.filter(name__icontains=query)
 
-    # Convert the results into a simple list of names
+    # Convert the results into a simple list of names  (e.g. ["Tech", "Technology"])
     results = list(categories.values_list('name', flat=True))
 
-    # Send the list back as JSON data (used by JavaScript)
-    return JsonResponse({'results': results})
+    # Check if the exact typed word already exists
+    already_exists = Category.objects.filter(name__iexact=query).exists()
+
+    # Return both results and a flag for existence
+    return JsonResponse({
+        'results': results,
+        'exists': already_exists,
+        'typed': query,  # send back what user typed (for frontend use)
+    })

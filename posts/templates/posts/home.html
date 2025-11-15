@@ -1,5 +1,4 @@
-{% load static %}
-{% load humanize %}
+{% load static %} {% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -176,14 +175,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- ================================================== -->
-    <!--  AJAX SCRIPT : CATEGORY SEARCH (Live Suggestion)    -->
+    <!--  CATEGORY AUTO-SUGGEST + CREATE FEATURE -->
     <!-- ================================================== -->
     <script>
       /*
-This script runs in browser and connects the "categoryInput" box
-to our Django backend using AJAX (fetch API).
-It shows a list of matching categories as user types.
-*/
+    This script listens for typing in the category box.
+    It:
+    1️ Fetches existing category suggestions from Django (via AJAX).
+    2️ Shows them live below the input box.
+    3️ If user’s category doesn’t exist → shows “➕ Create ‘<name>’” option.
+    4️ When clicked, fills the input box automatically.
+    */
       const input = document.getElementById("categoryInput"); // text input box
       const suggestionBox = document.getElementById("categorySuggestions"); // suggestion box below input
 
@@ -203,30 +205,82 @@ It shows a list of matching categories as user types.
           .then((response) => response.json()) // convert response to JSON
           .then((data) => {
             const results = data.results; // get list of matching categories
+            const exists = data.exists; // does category already exist?
+            const typed = data.typed; // what user typed
 
-            // If we have results, display them
+            //  If the typed word matches an existing category exactly, hide suggestions
+            if (exists) {
+              suggestionBox.style.display = "none";
+              suggestionBox.innerHTML = "";
+              return;
+            }
+
+            // Build HTML for other suggestions
+            let html = "";
+
             if (results.length > 0) {
-              suggestionBox.innerHTML = results
+              html += results
                 .map(
                   (item) =>
                     `<div class="p-2 suggestion-item" style="cursor:pointer">${item}</div>`
                 )
                 .join("");
-              suggestionBox.style.display = "block";
-            } else {
-              // No results found message
-              suggestionBox.innerHTML =
-                '<div class="p-2 text-muted">No categories found</div>';
-              suggestionBox.style.display = "block";
             }
 
-            // If user clicks on a suggestion → fill box and hide suggestions
+            if (!exists && typed.length > 0) {
+              html += `<div class="p-2 text-primary fw-semibold suggestion-create" style="cursor:pointer; background-color:#f8f9fa;">
+                  ➕ Create "${typed}" category
+               </div>`;
+            }
+
+            if (html === "") {
+              html = '<div class="p-2 text-muted">No categories found</div>';
+            }
+
+            suggestionBox.innerHTML = html;
+            suggestionBox.style.display = "block";
+
+            // Handle click for existing category
             document.querySelectorAll(".suggestion-item").forEach((item) => {
               item.addEventListener("click", () => {
                 input.value = item.textContent;
                 suggestionBox.style.display = "none";
               });
             });
+
+            /*
+            Hide category suggestion box when clicking outside
+            or pressing Tab to move away.
+            */
+
+            document.addEventListener("click", function (e) {
+              // if click is outside both input and suggestion box → hide box
+              if (
+                !e.target.closest("#categoryInput") &&
+                !e.target.closest("#categorySuggestions")
+              ) {
+                suggestionBox.style.display = "none";
+              }
+            });
+
+            // Hide on Tab key (focus leaves the input)
+            input.addEventListener("keydown", function (e) {
+              if (e.key === "Tab") {
+                suggestionBox.style.display = "none";
+              }
+            });
+            
+            // Handle click for create new
+            const createOption = document.querySelector(".suggestion-create");
+            if (createOption) {
+              createOption.addEventListener("click", () => {
+                input.value = typed;
+                suggestionBox.style.display = "none";
+                alert(
+                  `"${typed}" will be created automatically when you post!`
+                );
+              });
+            }
           })
           .catch((error) => console.error("Error fetching categories:", error));
       });
