@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'posts',    # our new app added
+    'django.contrib.humanize',  # enables natural time filters
 ]
 
 MIDDLEWARE = [
