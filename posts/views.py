@@ -1,12 +1,15 @@
 # posts/views.py
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Post, Category
-from .forms import PostForm  # Import our new form
-from django.http import JsonResponse  # Needed to send JSON data back to JS
+from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.contrib import messages  # Import Django messages framework
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt  # for AJAX create category
+
+from .models import Post, Category
+from .forms import PostForm
+
 
 # -----------------------------
 # Home page view
@@ -32,13 +35,11 @@ def home(request):
             # If user entered a category
             if category_name:
                 # Try to find it in database, or create a new one if not found
-                category, created = Category.objects.get_or_create(
-                    name=category_name)
+                category, created = Category.objects.get_or_create(name=category_name)
 
                 # If category was newly created, show success message
                 if created:
-                    messages.success(
-                        request, f"New category '{category_name}' created!")
+                    messages.success(request, f"New category '{category_name}' created!")
 
                 # Assign the category to the post
                 post.category = category
@@ -47,8 +48,7 @@ def home(request):
             post.save()
 
             # Show a success message for post creation
-            messages.success(
-                request, "Your post has been shared successfully!")
+            messages.success(request, "Your post has been shared successfully!")
 
             # Redirect back to home to avoid form resubmission
             return redirect('home')
@@ -102,25 +102,50 @@ def ajax_upvote_post(request, post_id):
 # -------------------------------------------
 # Category Search API (AJAX)
 # -------------------------------------------
-# This function will return matching categories as JSON
-# Example: /categories/search/?q=tech  → returns ["Technology", "Tech News"]
-
 def search_categories(request):
-    # Get the text user typed in the search bar (example: ?q=tech)
-    query = request.GET.get('q', '')
+    # get the text user typed
+    query = request.GET.get('q', '').strip()
 
-    # Find categories containing that text (case insensitive)
+    # find all categories that contain that word (case insensitive)
     categories = Category.objects.filter(name__icontains=query)
 
-    # Convert the results into a simple list of names  (e.g. ["Tech", "Technology"])
+    # convert queryset to a simple list of names
     results = list(categories.values_list('name', flat=True))
 
-    # Check if the exact typed word already exists
-    already_exists = Category.objects.filter(name__iexact=query).exists()
+    # check if the exact word already exists
+    exists = Category.objects.filter(name__iexact=query).exists()
 
-    # Return both results and a flag for existence
+    # send all info as JSON back to the browser
     return JsonResponse({
-        'results': results,
-        'exists': already_exists,
-        'typed': query,  # send back what user typed (for frontend use)
+        'results': results,   # all matching categories
+        'exists': exists,     # True/False if exact match exists
+        'typed': query        # what user typed
     })
+
+
+# -----------------------------------------------------
+# AJAX endpoint: Create a new category instantly
+# -----------------------------------------------------
+# CSRF handled safely via X-CSRFToken header in JS
+def ajax_create_category(request):
+    # Only accept POST requests
+    if request.method == "POST":
+        # Get the category name sent from JavaScript
+        name = request.POST.get("name", "").strip()
+
+        # Prevent empty category names
+        if not name:
+            return JsonResponse({"success": False, "error": "Empty name"}, status=400)
+
+        # Try to find existing or create new
+        category, created = Category.objects.get_or_create(name=name)
+
+        # Send back response JSON
+        return JsonResponse({
+            "success": True,
+            "created": created,        # True if newly created, False if it already existed
+            "name": category.name
+        })
+
+    # If someone sends GET request → error
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)

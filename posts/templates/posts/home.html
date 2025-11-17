@@ -41,6 +41,41 @@
         align-items: center;
         gap: 6px;
       }
+
+      /* Smooth fade animation for suggestion box */
+      #categorySuggestions {
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      /* When visible, fade in */
+      #categorySuggestions.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* ===== Hover effect for category suggestions ===== */
+      .suggestion-item {
+        transition: background-color 0.15s ease, color 0.15s ease;
+      }
+
+      /* On hover — change background & text color */
+      .suggestion-item:hover {
+        background-color: #e7f1ff; /* soft blue */
+        color: #0d6efd; /* Bootstrap blue text */
+      }
+
+      /* Optional: make the "Create new category" button distinct */
+      .create-category {
+        font-weight: 500;
+        color: #0d6efd;
+        cursor: pointer;
+      }
+
+      .create-category:hover {
+        background-color: #eef5ff;
+      }
     </style>
   </head>
 
@@ -102,12 +137,7 @@
             <div
               id="categorySuggestions"
               class="border rounded bg-white mt-1"
-              style="
-                display: none;
-                position: absolute;
-                z-index: 1000;
-                width: 92%;
-              "
+              style="position: absolute; z-index: 1000; width: 92%"
             ></div>
 
             <!-- Submit Button -->
@@ -177,113 +207,144 @@
     <!-- ================================================== -->
     <!--  CATEGORY AUTO-SUGGEST + CREATE FEATURE -->
     <!-- ================================================== -->
-    <script>
-      /*
-    This script listens for typing in the category box.
-    It:
-    1️ Fetches existing category suggestions from Django (via AJAX).
-    2️ Shows them live below the input box.
-    3️ If user’s category doesn’t exist → shows “➕ Create ‘<name>’” option.
-    4️ When clicked, fills the input box automatically.
-    */
-      const input = document.getElementById("categoryInput"); // text input box
-      const suggestionBox = document.getElementById("categorySuggestions"); // suggestion box below input
+   <script>
+/*
+This script runs every time the user types in the category input.
+It:
+1. Fetches category suggestions from Django (/categories/search/).
+2. Displays them live below the input.
+3. Lets user create a new category instantly via AJAX (/categories/create/).
+*/
 
-      // This event runs every time the user types a key
-      input.addEventListener("keyup", function () {
-        const query = input.value.trim(); // get what user typed
+// Get references to HTML elements
+const input = document.getElementById("categoryInput");
+const suggestionBox = document.getElementById("categorySuggestions");
 
-        // If nothing typed, hide suggestions
-        if (!query) {
-          suggestionBox.style.display = "none";
-          suggestionBox.innerHTML = "";
-          return;
-        }
+// Helper to safely get CSRF token from cookies (required for POST)
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
 
-        // Send AJAX request to backend API
-        fetch(`/categories/search/?q=${query}`)
-          .then((response) => response.json()) // convert response to JSON
-          .then((data) => {
-            const results = data.results; // get list of matching categories
-            const exists = data.exists; // does category already exist?
-            const typed = data.typed; // what user typed
+// Run this whenever user types
+input.addEventListener("keyup", function () {
+  const query = input.value.trim();
 
-            //  If the typed word matches an existing category exactly, hide suggestions
-            if (exists) {
-              suggestionBox.style.display = "none";
-              suggestionBox.innerHTML = "";
-              return;
-            }
+  // If nothing typed, hide suggestion box
+  if (!query) {
+    suggestionBox.classList.remove("show");
+    suggestionBox.innerHTML = "";
+    return;
+  }
 
-            // Build HTML for other suggestions
-            let html = "";
+  // Fetch category suggestions from backend
+  fetch(`/categories/search/?q=${encodeURIComponent(query)}`)
+    .then((response) => response.json())
+    .then((data) => {
+      const results = data.results || [];
+      const exists = data.exists;
+      const typed = data.typed;
 
-            if (results.length > 0) {
-              html += results
-                .map(
-                  (item) =>
-                    `<div class="p-2 suggestion-item" style="cursor:pointer">${item}</div>`
-                )
-                .join("");
-            }
+      // Hide box if exact match exists
+      if (exists) {
+        suggestionBox.classList.remove("show");
+        suggestionBox.innerHTML = "";
+        return;
+      }
 
-            if (!exists && typed.length > 0) {
-              html += `<div class="p-2 text-primary fw-semibold suggestion-create" style="cursor:pointer; background-color:#f8f9fa;">
+      // Build suggestion list
+      let html = "";
+      if (results.length > 0) {
+        html += results
+          .map(
+            (item) =>
+              `<div class="p-2 suggestion-item" style="cursor:pointer">${item}</div>`
+          )
+          .join("");
+      }
+
+      // Add "Create new category" option
+      if (!exists && typed.length > 0) {
+        html += `<div class="p-2 text-primary fw-semibold suggestion-create" style="cursor:pointer; background-color:#f8f9fa;">
                   ➕ Create "${typed}" category
-               </div>`;
-            }
+                </div>`;
+      }
 
-            if (html === "") {
-              html = '<div class="p-2 text-muted">No categories found</div>';
-            }
+      // If nothing to show
+      if (html === "") {
+        html = '<div class="p-2 text-muted">No categories found</div>';
+      }
 
-            suggestionBox.innerHTML = html;
-            suggestionBox.style.display = "block";
+      // Insert HTML and show
+      suggestionBox.innerHTML = html;
+      suggestionBox.classList.add("show");
 
-            // Handle click for existing category
-            document.querySelectorAll(".suggestion-item").forEach((item) => {
-              item.addEventListener("click", () => {
-                input.value = item.textContent;
-                suggestionBox.style.display = "none";
-              });
-            });
-
-            /*
-            Hide category suggestion box when clicking outside
-            or pressing Tab to move away.
-            */
-
-            document.addEventListener("click", function (e) {
-              // if click is outside both input and suggestion box → hide box
-              if (
-                !e.target.closest("#categoryInput") &&
-                !e.target.closest("#categorySuggestions")
-              ) {
-                suggestionBox.style.display = "none";
-              }
-            });
-
-            // Hide on Tab key (focus leaves the input)
-            input.addEventListener("keydown", function (e) {
-              if (e.key === "Tab") {
-                suggestionBox.style.display = "none";
-              }
-            });
-            
-            // Handle click for create new
-            const createOption = document.querySelector(".suggestion-create");
-            if (createOption) {
-              createOption.addEventListener("click", () => {
-                input.value = typed;
-                suggestionBox.style.display = "none";
-                alert(
-                  `"${typed}" will be created automatically when you post!`
-                );
-              });
-            }
-          })
-          .catch((error) => console.error("Error fetching categories:", error));
+      // Click on existing category
+      document.querySelectorAll(".suggestion-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          input.value = item.textContent;
+          suggestionBox.classList.remove("show");
+        });
       });
-    </script>
+
+      // Click outside hides box
+      document.addEventListener("click", function (e) {
+        if (
+          !e.target.closest("#categoryInput") &&
+          !e.target.closest("#categorySuggestions")
+        ) {
+          suggestionBox.classList.remove("show");
+        }
+      });
+
+      // Create new category click
+      const createOption = document.querySelector(".suggestion-create");
+      if (createOption) {
+        createOption.addEventListener("click", () => {
+          const categoryName = typed;
+
+          fetch("/categories/create/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": getCookie("csrftoken"), // important!
+            },
+            body: `name=${encodeURIComponent(categoryName)}`,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                input.value = data.name;
+                suggestionBox.classList.remove("show");
+                alert(
+                  data.created
+                    ? `New category "${data.name}" created!`
+                    : `Category "${data.name}" already existed.`
+                );
+              } else {
+                alert("Could not create category: " + data.error);
+              }
+            })
+            .catch((error) =>
+              console.error("Error creating category:", error)
+            );
+        });
+      }
+    })
+    .catch((error) => console.error("Error fetching categories:", error));
+});
+</script>
+
+
   </body>
 </html>
