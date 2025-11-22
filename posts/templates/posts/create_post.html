@@ -4,7 +4,44 @@
   <head>
     <meta charset="UTF-8" />
     <title>Create Post</title>
-    <style></style>
+    <style>
+      .add-bar {
+        display: flex;
+        gap: 25px;
+        padding: 18px 12px;
+        margin-top: 8px;
+        background: #e8e8e8;
+        border-top: 1px solid #ddd;
+      }
+
+      .add-bar span {
+        display: flex;
+        gap: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .plus {
+        color: #3ca65a;
+        font-weight: 700;
+      }
+
+      .preview-area {
+        background: #e8e8e8;
+        border-top: 1px solid #ccc;
+        padding: 14px;
+        margin-top: 10px;
+        display: none;
+        border-radius: 6px;
+      }
+
+      .thumbnail-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 100px);
+        gap: 12px;
+      }
+    </style>
   </head>
 
   <body>
@@ -37,6 +74,29 @@
             <span id="addSourceBtn"
               ><span class="plus">+</span> Add Source</span
             >
+          </div>
+
+          <!-- ================= PREVIEW BOX (HIDDEN) ================= -->
+          <div id="previewArea" class="preview-area">
+            <!-- Hidden inputs -->
+            <input
+              type="file"
+              id="imageInput"
+              accept="image/*"
+              multiple
+              hidden
+            />
+            <input type="file" id="videoInput" accept="video/*" hidden />
+            <input type="file" id="sourceInput" hidden />
+
+            <!-- Image thumbnails will appear here -->
+            <div id="thumbnailContainer" class="thumbnail-container"></div>
+
+            <!-- Video + Source combined list -->
+            <div id="combinedPreview"></div>
+
+            <!-- Footer status -->
+            <div id="previewStatusBar" class="preview-status"></div>
           </div>
         </div>
       </form>
