@@ -199,6 +199,30 @@
       {% endfor %}
     </div>
 
+    <!-- ============================= -->
+    <!-- Bootstrap Toast Notification -->
+    <!-- ============================= -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+      <div
+        id="liveToast"
+        class="toast align-items-center text-bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body" id="toastMessage">
+            Category created successfully!
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    </div>
     <!-- ================================================== -->
     <!--  BOOTSTRAP JS (for dropdowns, buttons, etc.)        -->
     <!-- ================================================== -->
@@ -207,144 +231,154 @@
     <!-- ================================================== -->
     <!--  CATEGORY AUTO-SUGGEST + CREATE FEATURE -->
     <!-- ================================================== -->
-   <script>
-/*
-This script runs every time the user types in the category input.
-It:
-1. Fetches category suggestions from Django (/categories/search/).
-2. Displays them live below the input.
-3. Lets user create a new category instantly via AJAX (/categories/create/).
-*/
+    <script>
+  /*
+  This script runs every time the user types in the category input.
+  It:
+  1. Fetches category suggestions from Django (/categories/search/).
+  2. Displays them live below the input.
+  3. Lets user create a new category instantly via AJAX (/categories/create/).
+  */
 
-// Get references to HTML elements
-const input = document.getElementById("categoryInput");
-const suggestionBox = document.getElementById("categorySuggestions");
+  // Get references to HTML elements
+  const input = document.getElementById("categoryInput");
+  const suggestionBox = document.getElementById("categorySuggestions");
 
-// Helper to safely get CSRF token from cookies (required for POST)
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
+  // Helper to safely get CSRF token from cookies (required for POST)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
       }
     }
-  }
-  return cookieValue;
-}
-
-// Run this whenever user types
-input.addEventListener("keyup", function () {
-  const query = input.value.trim();
-
-  // If nothing typed, hide suggestion box
-  if (!query) {
-    suggestionBox.classList.remove("show");
-    suggestionBox.innerHTML = "";
-    return;
+    return cookieValue;
   }
 
-  // Fetch category suggestions from backend
-  fetch(`/categories/search/?q=${encodeURIComponent(query)}`)
-    .then((response) => response.json())
-    .then((data) => {
-      const results = data.results || [];
-      const exists = data.exists;
-      const typed = data.typed;
+  // Run this whenever user types
+  input.addEventListener("keyup", function () {
+    const query = input.value.trim();
 
-      // Hide box if exact match exists
-      if (exists) {
-        suggestionBox.classList.remove("show");
-        suggestionBox.innerHTML = "";
-        return;
-      }
+    // If nothing typed, hide suggestion box
+    if (!query) {
+      suggestionBox.classList.remove("show");
+      suggestionBox.innerHTML = "";
+      return;
+    }
 
-      // Build suggestion list
-      let html = "";
-      if (results.length > 0) {
-        html += results
-          .map(
-            (item) =>
-              `<div class="p-2 suggestion-item" style="cursor:pointer">${item}</div>`
-          )
-          .join("");
-      }
+    // Fetch category suggestions from backend
+    fetch(`/categories/search/?q=${encodeURIComponent(query)}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const results = data.results || [];
+        const exists = data.exists;
+        const typed = data.typed;
 
-      // Add "Create new category" option
-      if (!exists && typed.length > 0) {
-        html += `<div class="p-2 text-primary fw-semibold suggestion-create" style="cursor:pointer; background-color:#f8f9fa;">
-                  ➕ Create "${typed}" category
-                </div>`;
-      }
-
-      // If nothing to show
-      if (html === "") {
-        html = '<div class="p-2 text-muted">No categories found</div>';
-      }
-
-      // Insert HTML and show
-      suggestionBox.innerHTML = html;
-      suggestionBox.classList.add("show");
-
-      // Click on existing category
-      document.querySelectorAll(".suggestion-item").forEach((item) => {
-        item.addEventListener("click", () => {
-          input.value = item.textContent;
+        // Hide box if exact match exists
+        if (exists) {
           suggestionBox.classList.remove("show");
-        });
-      });
-
-      // Click outside hides box
-      document.addEventListener("click", function (e) {
-        if (
-          !e.target.closest("#categoryInput") &&
-          !e.target.closest("#categorySuggestions")
-        ) {
-          suggestionBox.classList.remove("show");
+          suggestionBox.innerHTML = "";
+          return;
         }
-      });
 
-      // Create new category click
-      const createOption = document.querySelector(".suggestion-create");
-      if (createOption) {
-        createOption.addEventListener("click", () => {
-          const categoryName = typed;
+        // Build suggestion list
+        let html = "";
+        if (results.length > 0) {
+          html += results
+            .map(
+              (item) =>
+                `<div class="p-2 suggestion-item" style="cursor:pointer">${item}</div>`
+            )
+            .join("");
+        }
 
-          fetch("/categories/create/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              "X-CSRFToken": getCookie("csrftoken"), // important!
-            },
-            body: `name=${encodeURIComponent(categoryName)}`,
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                input.value = data.name;
-                suggestionBox.classList.remove("show");
-                alert(
-                  data.created
-                    ? `New category "${data.name}" created!`
-                    : `Category "${data.name}" already existed.`
-                );
-              } else {
-                alert("Could not create category: " + data.error);
-              }
-            })
-            .catch((error) =>
-              console.error("Error creating category:", error)
-            );
+        // Add "Create new category" option
+        if (!exists && typed.length > 0) {
+          html += `<div class="p-2 text-primary fw-semibold suggestion-create" style="cursor:pointer; background-color:#f8f9fa;">
+              ➕ Create "${typed}" category
+            </div>`;
+        }
+
+        // If nothing to show
+        if (html === "") {
+          html = '<div class="p-2 text-muted">No categories found</div>';
+        }
+
+        // Insert HTML and show
+        suggestionBox.innerHTML = html;
+        suggestionBox.classList.add("show");
+
+        // Click on existing category
+        document.querySelectorAll(".suggestion-item").forEach((item) => {
+          item.addEventListener("click", () => {
+            input.value = item.textContent;
+            suggestionBox.classList.remove("show");
+          });
         });
-      }
-    })
-    .catch((error) => console.error("Error fetching categories:", error));
-});
+
+        // Click outside hides box
+        document.addEventListener("click", function (e) {
+          if (
+            !e.target.closest("#categoryInput") &&
+            !e.target.closest("#categorySuggestions")
+          ) {
+            suggestionBox.classList.remove("show");
+          }
+        });
+
+        // Create new category click
+        const createOption = document.querySelector(".suggestion-create");
+        if (createOption) {
+          createOption.addEventListener("click", () => {
+            const categoryName = typed;
+
+            fetch("/categories/create/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCookie("csrftoken"), // important!
+              },
+              body: `name=${encodeURIComponent(categoryName)}`,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  input.value = data.name;
+                  suggestionBox.classList.remove("show");
+
+                  // Update toast message text dynamically
+                  const toastMessage =
+                    document.getElementById("toastMessage");
+                  toastMessage.textContent = data.created
+                    ? `Category "${data.name}" created successfully!`
+                    : `Category "${data.name}" already exists!`;
+
+                  // Show the toast
+                  const toastElement =
+                    document.getElementById("liveToast");
+                  const toast = new bootstrap.Toast(toastElement, {
+                    delay: 2500,
+                  }); // 2.5s auto-hide
+                  toast.show();
+                } else {
+                  console.error("Error creating category:", data.error);
+                }
+              })
+              .catch((error) =>
+                console.error("Error creating category:", error)
+              );
+          });
+        }
+      })
+      .catch((error) =>
+        console.error("Error fetching categories:", error)
+      );
+  });
 </script>
-
-
-  </body>
+</body>
 </html>
