@@ -11,7 +11,22 @@
       <h1>Create Post</h1>
 
       <form>
-        <!-- More fields will come in next commits -->
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" name="title" placeholder="Enter your post title" />
+        </div>
+
+        <div class="form-group">
+          <label>Summary</label>
+          <div class="textarea-wrapper">
+            <textarea
+              id="summary"
+              name="summary"
+              placeholder="Write a short summary..."
+            ></textarea>
+            <div class="word-count" id="wordCount">Word count: 0</div>
+          </div>
+        </div>
       </form>
     </div>
   </body>
