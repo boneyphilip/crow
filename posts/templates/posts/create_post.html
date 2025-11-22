@@ -4,6 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Create Post</title>
+    <style></style>
   </head>
 
   <body>
@@ -26,8 +27,25 @@
             ></textarea>
             <div class="word-count" id="wordCount">Word count: 0</div>
           </div>
+
+          <!-- ================= ADD BAR ================= -->
+          <div class="add-bar">
+            <span id="addImageBtn"
+              ><span class="plus">+</span> Add Pictures</span
+            >
+            <span id="addVideoBtn"><span class="plus">+</span> Add Video</span>
+            <span id="addSourceBtn"
+              ><span class="plus">+</span> Add Source</span
+            >
+          </div>
         </div>
       </form>
     </div>
+    <script>
+      document.getElementById("summary").addEventListener("input", function () {
+        const w = this.value.trim().split(/\s+/).filter(Boolean).length;
+        document.getElementById("wordCount").textContent = "Word count: " + w;
+      });
+    </script>
   </body>
 </html>
