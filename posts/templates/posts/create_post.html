@@ -216,6 +216,41 @@
             <div id="previewStatusBar" class="preview-status"></div>
           </div>
         </div>
+
+        <!-- ================= CATEGORY SECTION ================= -->
+        <div class="form-group" style="position: relative">
+          <label>Category</label>
+
+          <input
+            type="text"
+            id="categoryInput"
+            name="category_name"
+            placeholder="Start typing a category..."
+            style="
+              width: 100%;
+              padding: 12px;
+              border: 1px solid #ddd;
+              border-radius: 6px;
+              font-size: 15px;
+            "
+          />
+
+          <!-- Suggestion box -->
+          <div
+            id="categorySuggestions"
+            style="
+              position: absolute;
+              top: 78px;
+              left: 0;
+              width: 100%;
+              background: white;
+              border: 1px solid #ddd;
+              border-radius: 6px;
+              display: none;
+              z-index: 2000;
+            "
+          ></div>
+        </div>
       </form>
     </div>
 
