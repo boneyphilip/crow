@@ -43,8 +43,8 @@
       }
 
       /* ============================================================
-   IMAGE THUMBNAILS
-============================================================ */
+        IMAGE THUMBNAILS
+        ============================================================ */
       .thumbnail {
         width: 100px;
         height: 100px;
@@ -96,8 +96,8 @@
       }
 
       /* ============================================================
-   VIDEO + DOCUMENT ROW ITEMS
-============================================================ */
+        VIDEO + DOCUMENT ROW ITEMS
+        ============================================================ */
       .row-item {
         display: flex;
         align-items: center;
@@ -149,8 +149,8 @@
       }
 
       /* ============================================================
-   PREVIEW STATUS BAR
-============================================================ */
+        PREVIEW STATUS BAR
+        =========================================================== */
       .preview-status {
         text-align: right;
         margin-top: 10px;
@@ -218,10 +218,183 @@
         </div>
       </form>
     </div>
+
     <script>
+      /* ===============================================================
+        WORD COUNT
+        ================================================================ */
       document.getElementById("summary").addEventListener("input", function () {
-        const w = this.value.trim().split(/\s+/).filter(Boolean).length;
-        document.getElementById("wordCount").textContent = "Word count: " + w;
+        const words = this.value.trim().split(/\s+/).filter(Boolean).length;
+        document.getElementById("wordCount").textContent =
+          "Word count: " + words;
+      });
+
+      /* ===============================================================
+        ELEMENT REFERENCES
+        ================================================================ */
+      const previewArea = document.getElementById("previewArea");
+      const previewStatus = document.getElementById("previewStatusBar");
+
+      const addImageBtn = document.getElementById("addImageBtn");
+      const addVideoBtn = document.getElementById("addVideoBtn");
+      const addSourceBtn = document.getElementById("addSourceBtn");
+
+      const imageInput = document.getElementById("imageInput");
+      const videoInput = document.getElementById("videoInput");
+      const sourceInput = document.getElementById("sourceInput");
+
+      const thumbnailContainer = document.getElementById("thumbnailContainer");
+      const combinedPreview = document.getElementById("combinedPreview");
+
+      // counters
+      let imgCount = 0;
+      let vidCount = 0;
+      let srcCount = 0;
+
+      /* ===============================================================
+        HELPERS
+        ================================================================ */
+      function showBox() {
+        previewArea.style.display = "block";
+      }
+
+      function updateStatus() {
+        previewStatus.textContent = `Images: ${imgCount} | Video: ${vidCount} | Sources: ${srcCount}`;
+      }
+
+      function hideIfEmpty() {
+        if (imgCount === 0 && vidCount === 0 && srcCount === 0) {
+          previewArea.style.display = "none";
+        }
+      }
+
+      /* ===============================================================
+        IMAGE HANDLING
+        ================================================================ */
+      addImageBtn.onclick = () => imageInput.click();
+
+      imageInput.addEventListener("change", () => {
+        if (!imageInput.files.length) return;
+        showBox();
+
+        Array.from(imageInput.files).forEach((file) => {
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            const div = document.createElement("div");
+            div.className = "thumbnail";
+
+            div.innerHTML = `
+                <img src="${e.target.result}">
+                <div class="thumb-number">${imgCount + 1}</div>
+                <button class="remove-btn">&times;</button>
+            `;
+
+            thumbnailContainer.appendChild(div);
+            imgCount++;
+            updateStatus();
+
+            div.querySelector(".remove-btn").onclick = () => {
+              div.remove();
+              imgCount--;
+              renumberImages();
+              updateStatus();
+              hideIfEmpty();
+            };
+          };
+
+          reader.readAsDataURL(file);
+        });
+
+        imageInput.value = "";
+      });
+
+      function renumberImages() {
+        document
+          .querySelectorAll(".thumb-number")
+          .forEach((num, i) => (num.textContent = i + 1));
+      }
+
+      /* ===============================================================
+        VIDEO HANDLING (ONLY ONE)
+        ================================================================ */
+      addVideoBtn.onclick = () => videoInput.click();
+
+      videoInput.addEventListener("change", () => {
+        if (!videoInput.files.length) return;
+
+        if (vidCount >= 1) {
+          alert("Only 1 video allowed.");
+          videoInput.value = "";
+          return;
+        }
+
+        showBox();
+
+        const file = videoInput.files[0];
+
+        const row = document.createElement("div");
+        row.className = "row-item";
+
+        row.innerHTML = `
+        <svg class="row-icon" viewBox="0 0 24 24">
+            <path d="M17 10.5V7a2 2 0 0 0-2-2H5A2 2 0 0 0 3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
+        </svg>
+
+        <span class="row-filename">${file.name}</span>
+        <button class="remove-row-btn">&times;</button>
+    `;
+
+        combinedPreview.appendChild(row);
+        vidCount = 1;
+        updateStatus();
+
+        row.querySelector(".remove-row-btn").onclick = () => {
+          row.remove();
+          vidCount = 0;
+          updateStatus();
+          hideIfEmpty();
+        };
+
+        videoInput.value = "";
+      });
+
+      /* ===============================================================
+        SOURCE DOCUMENT HANDLING (ANY FILES)
+        ================================================================ */
+      addSourceBtn.onclick = () => sourceInput.click();
+
+      sourceInput.addEventListener("change", () => {
+        if (!sourceInput.files.length) return;
+
+        showBox();
+
+        Array.from(sourceInput.files).forEach((file) => {
+          const row = document.createElement("div");
+          row.className = "row-item";
+
+          row.innerHTML = `
+            <svg class="row-icon" viewBox="0 0 24 24">
+                <path d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+            </svg>
+
+            <span class="row-filename">${file.name}</span>
+            <button class="remove-row-btn">&times;</button>
+        `;
+
+          combinedPreview.appendChild(row);
+          srcCount++;
+          updateStatus();
+
+          row.querySelector(".remove-row-btn").onclick = () => {
+            row.remove();
+            srcCount--;
+            updateStatus();
+            hideIfEmpty();
+          };
+        });
+
+        sourceInput.value = "";
       });
     </script>
   </body>
