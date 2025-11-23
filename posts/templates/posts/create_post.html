@@ -497,6 +497,97 @@
 
         sourceInput.value = "";
       });
+
+      /* ===============================================================
+   CATEGORY AUTO-SUGGEST + CREATE
+================================================================ */
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let c of cookies) {
+            const cookie = c.trim();
+            if (cookie.startsWith(name + "=")) {
+              cookieValue = decodeURIComponent(cookie.split("=")[1]);
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
+      const categoryInput = document.getElementById("categoryInput");
+      const suggestionBox = document.getElementById("categorySuggestions");
+
+      categoryInput.addEventListener("keyup", function () {
+        const query = categoryInput.value.trim();
+        if (!query) {
+          suggestionBox.classList.remove("show");
+          suggestionBox.innerHTML = "";
+          return;
+        }
+
+        fetch(`/categories/search/?q=${encodeURIComponent(query)}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const results = data.results;
+            const exists = data.exists;
+            const typed = data.typed;
+
+            if (exists) {
+              suggestionBox.classList.remove("show");
+              return;
+            }
+
+            let html = "";
+            results.forEach((item) => {
+              html += `<div class="suggestion-item">${item}</div>`;
+            });
+
+            html += `
+        <div class="suggestion-create">
+          ➕ Create "${typed}"
+        </div>
+      `;
+
+            suggestionBox.innerHTML = html;
+            suggestionBox.classList.add("show");
+
+            document.querySelectorAll(".suggestion-item").forEach((item) => {
+              item.onclick = () => {
+                categoryInput.value = item.textContent;
+                suggestionBox.classList.remove("show");
+              };
+            });
+
+            document.querySelector(".suggestion-create").onclick = () => {
+              fetch("/categories/create/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  "X-CSRFToken": getCookie("csrftoken"),
+                },
+                body: `name=${encodeURIComponent(typed)}`,
+              })
+                .then((r) => r.json())
+                .then((d) => {
+                  categoryInput.value = d.name;
+                  suggestionBox.classList.remove("show");
+                });
+            };
+          });
+      });
+
+      // Hide suggestion box when clicking outside
+      document.addEventListener("click", function (e) {
+        if (
+          !e.target.closest("#categoryInput") &&
+          !e.target.closest("#categorySuggestions")
+        ) {
+          suggestionBox.classList.remove("show");
+        }
+      });
     </script>
   </body>
 </html>
