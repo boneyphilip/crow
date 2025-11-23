@@ -5,147 +5,121 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt  # for AJAX create category
 
 from .models import Post, Category
 from .forms import PostForm
 
 
-# -----------------------------
-# Home page view
-# Handles post creation + shows posts + adds success messages
-# -----------------------------
+# ==================================================
+# HOME PAGE — shows posts, handles simple form post
+# ==================================================
 def home(request):
-    # If user submitted the form (POST request)
+
     if request.method == "POST":
-        form = PostForm(request.POST)  # Bind the form with user input
-        if form.is_valid():  # Validate form data
-            # Create a Post object but don’t save yet
+        form = PostForm(request.POST)
+
+        if form.is_valid():
             post = form.save(commit=False)
-            # Assign author (use logged-in user, fallback to first user)
+
+            # Assign author (fallback: first user)
             post.author = request.user if request.user.is_authenticated else User.objects.first()
-            post.created_at = timezone.now()  # Set the current time as creation time
+            post.created_at = timezone.now()
 
-            # -----------------------------
-            # SMART CATEGORY CREATION LOGIC
-            # -----------------------------
-            # Extract category name from the form
-            category_name = request.POST.get('category_name')
+            # CATEGORY LOGIC
+            category_name = request.POST.get("category_name", "").strip()
 
-            # If user entered a category
             if category_name:
-                # Try to find it in database, or create a new one if not found
-                category, created = Category.objects.get_or_create(name=category_name)
+                category, created = Category.objects.get_or_create(
+                    name=category_name)
 
-                # If category was newly created, show success message
                 if created:
-                    messages.success(request, f"New category '{category_name}' created!")
+                    messages.success(
+                        request, f"New category '{category_name}' created!")
 
-                # Assign the category to the post
                 post.category = category
 
-            # Save post to database
+            # Save post
             post.save()
 
-            # Show a success message for post creation
-            messages.success(request, "Your post has been shared successfully!")
-
-            # Redirect back to home to avoid form resubmission
-            return redirect('home')
+            messages.success(
+                request, "Your post has been shared successfully!")
+            return redirect("home")
 
     else:
-        # If just viewing the page, show empty form
         form = PostForm()
 
-    # Fetch all posts from newest to oldest
-    posts = Post.objects.all().order_by('-created_at')
+    posts = Post.objects.all().order_by("-created_at")
 
-    # Pass data to the template
-    return render(request, 'posts/home.html', {'form': form, 'posts': posts})
-
-
-# -----------------------------
-# Upvote View
-# Increases upvote count by +1 when user clicks the button
-# -----------------------------
-def upvote_post(request, post_id):
-    # Fetch post by ID, or show 404 if not found
-    post = get_object_or_404(Post, id=post_id)
-    # Increase upvotes by 1
-    post.upvotes += 1
-    post.save()
-    # Redirect back to homepage
-    return redirect('home')
-
-
-# -------------------------------------------
-# AJAX upvote view
-# This handles upvotes instantly (no reload)
-# -------------------------------------------
-def ajax_upvote_post(request, post_id):
-    # Only accept POST requests for security
-    if request.method == "POST":
-        # Get the post safely (or 404 if not found)
-        post = get_object_or_404(Post, id=post_id)
-
-        # Increase the upvote count by 1
-        post.upvotes += 1
-        post.save()
-
-        # Send back the updated count in JSON format
-        return JsonResponse({"upvotes": post.upvotes})
-
-    # If not a POST request, return an error
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-# -------------------------------------------
-# Category Search API (AJAX)
-# -------------------------------------------
-def search_categories(request):
-    # get the text user typed
-    query = request.GET.get('q', '').strip()
-
-    # find all categories that contain that word (case insensitive)
-    categories = Category.objects.filter(name__icontains=query)
-
-    # convert queryset to a simple list of names
-    results = list(categories.values_list('name', flat=True))
-
-    # check if the exact word already exists
-    exists = Category.objects.filter(name__iexact=query).exists()
-
-    # send all info as JSON back to the browser
-    return JsonResponse({
-        'results': results,   # all matching categories
-        'exists': exists,     # True/False if exact match exists
-        'typed': query        # what user typed
+    return render(request, "posts/home.html", {
+        "form": form,
+        "posts": posts
     })
 
 
-# -----------------------------------------------------
-# AJAX endpoint: Create a new category instantly
-# -----------------------------------------------------
-# CSRF handled safely via X-CSRFToken header in JS
-def ajax_create_category(request):
-    # Only accept POST requests
+# ==================================================
+# CREATE POST PAGE (The big UI page)
+# ==================================================
+def create_post(request):
+    return render(request, "posts/create_post.html")
+
+
+# ==================================================
+# NORMAL UPVOTE
+# ==================================================
+def upvote_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    post.upvotes += 1
+    post.save()
+    return redirect("home")
+
+
+# ==================================================
+# AJAX UPVOTE
+# ==================================================
+def ajax_upvote_post(request, post_id):
     if request.method == "POST":
-        # Get the category name sent from JavaScript
+        post = get_object_or_404(Post, id=post_id)
+        post.upvotes += 1
+        post.save()
+        return JsonResponse({"upvotes": post.upvotes})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+# ==================================================
+# CATEGORY LIVE SEARCH — AJAX
+# ==================================================
+def search_categories(request):
+    query = request.GET.get("q", "").strip()
+
+    categories = Category.objects.filter(name__icontains=query)
+    results = list(categories.values_list("name", flat=True))
+
+    exists = Category.objects.filter(name__iexact=query).exists()
+
+    return JsonResponse({
+        "results": results,
+        "exists": exists,
+        "typed": query,
+    })
+
+
+# ==================================================
+# CREATE CATEGORY — AJAX
+# ==================================================
+def ajax_create_category(request):
+    if request.method == "POST":
         name = request.POST.get("name", "").strip()
 
-        # Prevent empty category names
         if not name:
             return JsonResponse({"success": False, "error": "Empty name"}, status=400)
 
-        # Try to find existing or create new
         category, created = Category.objects.get_or_create(name=name)
 
-        # Send back response JSON
         return JsonResponse({
             "success": True,
-            "created": created,        # True if newly created, False if it already existed
-            "name": category.name
+            "created": created,
+            "name": category.name,
         })
 
-    # If someone sends GET request → error
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)

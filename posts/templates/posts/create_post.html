@@ -165,9 +165,22 @@
         color: #000;
       }
 
-      /* CATEGORY SUGGESTIONS */
+      /* CATEGORY SUGGESTION BOX */
+      #categorySuggestions {
+        position: absolute;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        width: 100%;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.2s ease;
+      }
+
       #categorySuggestions.show {
-        display: block;
+        opacity: 1;
+        visibility: visible;
       }
 
       .suggestion-item {
@@ -268,21 +281,7 @@
             "
           />
 
-          <!-- Suggestion box -->
-          <div
-            id="categorySuggestions"
-            style="
-              position: absolute;
-              top: 78px;
-              left: 0;
-              width: 100%;
-              background: white;
-              border: 1px solid #ddd;
-              border-radius: 6px;
-              display: none;
-              z-index: 2000;
-            "
-          ></div>
+          <div id="categorySuggestions"></div>
         </div>
 
         <!-- ================= BUTTONS ================= -->
@@ -498,18 +497,20 @@
         sourceInput.value = "";
       });
 
-      /* ===============================================================
-   CATEGORY AUTO-SUGGEST + CREATE
-================================================================ */
+      /* ==================================================================
+   CATEGORY AUTO-SUGGEST + CREATE (Full Working Version)
+================================================================== */
 
       function getCookie(name) {
         let cookieValue = null;
-        if (document.cookie !== "") {
+        if (document.cookie && document.cookie !== "") {
           const cookies = document.cookie.split(";");
-          for (let c of cookies) {
-            const cookie = c.trim();
+          for (let cookie of cookies) {
+            cookie = cookie.trim();
             if (cookie.startsWith(name + "=")) {
-              cookieValue = decodeURIComponent(cookie.split("=")[1]);
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
               break;
             }
           }
@@ -517,11 +518,12 @@
         return cookieValue;
       }
 
-      const categoryInput = document.getElementById("categoryInput");
+      const input = document.getElementById("categoryInput");
       const suggestionBox = document.getElementById("categorySuggestions");
 
-      categoryInput.addEventListener("keyup", function () {
-        const query = categoryInput.value.trim();
+      input.addEventListener("keyup", function () {
+        const query = input.value.trim();
+
         if (!query) {
           suggestionBox.classList.remove("show");
           suggestionBox.innerHTML = "";
@@ -529,14 +531,16 @@
         }
 
         fetch(`/categories/search/?q=${encodeURIComponent(query)}`)
-          .then((res) => res.json())
+          .then((response) => response.json())
           .then((data) => {
-            const results = data.results;
+            const results = data.results || [];
             const exists = data.exists;
             const typed = data.typed;
 
+            // exact match -> hide
             if (exists) {
               suggestionBox.classList.remove("show");
+              suggestionBox.innerHTML = "";
               return;
             }
 
@@ -547,7 +551,7 @@
 
             html += `
         <div class="suggestion-create">
-          ➕ Create "${typed}"
+            ➕ Create "${typed}"
         </div>
       `;
 
@@ -556,7 +560,7 @@
 
             document.querySelectorAll(".suggestion-item").forEach((item) => {
               item.onclick = () => {
-                categoryInput.value = item.textContent;
+                input.value = item.textContent;
                 suggestionBox.classList.remove("show");
               };
             });
@@ -572,14 +576,14 @@
               })
                 .then((r) => r.json())
                 .then((d) => {
-                  categoryInput.value = d.name;
+                  input.value = d.name;
                   suggestionBox.classList.remove("show");
                 });
             };
           });
       });
 
-      // Hide suggestion box when clicking outside
+      // Hide on outside click
       document.addEventListener("click", function (e) {
         if (
           !e.target.closest("#categoryInput") &&

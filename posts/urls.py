@@ -21,6 +21,13 @@ urlpatterns = [
     path('', views.home, name='home'),
 
     # -----------------------------------------------
+    #  Create Post Page
+    # -----------------------------------------------
+    path('create/', views.create_post, name='create_post'),
+
+
+
+    # -----------------------------------------------
     #  Normal Upvote (non-AJAX)
     # -----------------------------------------------
     # This version reloads the page after upvoting.
@@ -35,7 +42,8 @@ urlpatterns = [
     # The frontend JS calls this route with a POST request.
     # Example URL: /ajax/upvote/3/
     # It runs the ajax_upvote_post() view.
-    path('ajax/upvote/<int:post_id>/', views.ajax_upvote_post, name='ajax_upvote_post'),
+    path('ajax/upvote/<int:post_id>/',
+         views.ajax_upvote_post, name='ajax_upvote_post'),
 
     # -----------------------------------------------
     #  Category Search API (AJAX)
@@ -51,5 +59,6 @@ urlpatterns = [
     # When the user clicks "Create 'Cars' category" in the suggestion dropdown,
     # the frontend sends an AJAX POST request here.
     # This instantly creates the new category in the database.
-    path('categories/create/', views.ajax_create_category, name='ajax_create_category'),
+    path('categories/create/', views.ajax_create_category,
+         name='ajax_create_category'),
 ]
