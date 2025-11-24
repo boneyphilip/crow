@@ -5,204 +5,217 @@
     <meta charset="UTF-8" />
     <title>Create Post</title>
     <style>
+      /* GLOBAL PAGE LAYOUT */
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        background: #f6f7f8;
+        margin: 0;
+        padding: 60px 0;
+        color: #333;
+      }
+
+      /* Main card */
+      .container {
+        max-width: 760px;
+        margin: auto;
+        background: #fff;
+        border: 1px solid #e2e2e2;
+        border-radius: 10px;
+        padding: 45px 52px 60px 52px;
+        box-sizing: border-box;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      }
+
+      /* Title */
+      h1 {
+        font-size: 32px;
+        margin-bottom: 30px;
+        font-weight: 400;
+        color: #1a1a1b;
+      }
+
+      /* FORM GROUPS */
+      .form-group {
+        margin-bottom: 26px;
+      }
+
+      .form-group label {
+        margin-bottom: 6px;
+        color: #1a1a1b;
+      }
+
+      /* Inputs */
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 14px 14px;
+        font-size: 15.5px;
+        border: 1px solid #cfcfcf;
+        border-radius: 6px;
+        box-sizing: border-box;
+        background: #fcfcfc;
+        transition: border 0.18s ease;
+      }
+
+      input[type="text"]:focus,
+      textarea:focus {
+        border-color: #7fb0ff;
+        outline: none;
+        background: #ffffff;
+      }
+
+      textarea {
+        height: 130px;
+        resize: none;
+      }
+
+      /* Word count */
+      .word-count {
+        font-size: 12px;
+        color: #7a7a7a;
+        margin-top: 5px;
+      }
+
+      /* ADD BAR */
       .add-bar {
         display: flex;
-        gap: 25px;
-        padding: 18px 12px;
-        margin-top: 8px;
-        background: #e8e8e8;
-        border-top: 1px solid #ddd;
+        gap: 28px;
+        padding: 16px 12px;
+        margin-top: 12px;
+        background: #ececec;
+        border: 1px solid #d4d4d4;
+        border-radius: 6px;
       }
 
       .add-bar span {
         display: flex;
-        gap: 5px;
+        align-items: center;
+        gap: 6px;
         cursor: pointer;
         font-weight: 500;
-        font-size: 14px;
+        font-size: 14.5px;
+        color: #2b2b2b;
       }
 
       .plus {
-        color: #3ca65a;
-        font-weight: 700;
+        color: #2ecc71;
+        font-weight: 800;
       }
 
+      /* PREVIEW AREA */
       .preview-area {
-        background: #e8e8e8;
-        border-top: 1px solid #ccc;
+        background: #ececec;
+        border: 1px solid #d4d4d4;
         padding: 14px;
-        margin-top: 10px;
-        display: none;
+        margin-top: 12px;
         border-radius: 6px;
+        display: none;
       }
 
+      /* IMAGE GRID */
       .thumbnail-container {
         display: grid;
         grid-template-columns: repeat(auto-fill, 100px);
         gap: 12px;
       }
 
-      /* ============================================================
-        IMAGE THUMBNAILS
-        ============================================================ */
+      /* Thumbnails */
       .thumbnail {
         width: 100px;
         height: 100px;
         background: #fff;
-        border: 1px solid #ccc;
+        border: 1px solid #c9c9c9;
         border-radius: 6px;
         overflow: hidden;
         position: relative;
       }
 
-      .thumbnail img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      /* Number in bottom-left of image */
+      /* Thumb number */
       .thumb-number {
         position: absolute;
         bottom: 4px;
         left: 4px;
         padding: 2px 6px;
-        font-size: 12px;
-        color: #fff;
-        background: rgba(0, 0, 0, 0.7);
+        font-size: 11px;
+        background: rgba(0, 0, 0, 0.75);
         border-radius: 3px;
-        font-weight: 600;
       }
 
-      /* Remove X button on image */
+      /* Thumbnail remove btn */
       .remove-btn {
-        position: absolute;
-        top: 3px;
+        top: 4px;
         right: 4px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
         background: rgba(0, 0, 0, 0.65);
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 13px;
-        line-height: 19px;
-        transition: background 0.2s ease;
       }
 
-      .remove-btn:hover {
-        background: rgba(255, 0, 0, 0.75);
-      }
-
-      /* ============================================================
-        VIDEO + DOCUMENT ROW ITEMS
-        ============================================================ */
+      /* Row items */
       .row-item {
-        display: flex;
-        align-items: center;
-        background: #fff;
-        border: 1px solid #ccc;
+        padding: 11px 11px;
+        margin-top: 12px;
         border-radius: 6px;
-        padding: 10px 10px;
-        margin-top: 10px;
-        position: relative;
+        background: #fff;
+        border: 1px solid #c9c9c9;
       }
 
-      /* Icon to the left */
-      .row-icon {
-        width: 24px;
-        height: 24px;
-        margin-right: 10px;
-        flex-shrink: 0;
-      }
-
-      /* Filename text */
-      .row-filename {
-        flex: 1;
-        font-size: 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      /* Remove button for row items */
+      /* Remove row btn */
       .remove-row-btn {
-        position: absolute;
-        top: 50%;
-        right: 8px;
-        transform: translateY(-50%);
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, 0.65);
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 13px;
-        line-height: 19px;
-        transition: background 0.2s ease;
+        background: rgba(0, 0, 0, 0.55);
       }
 
       .remove-row-btn:hover {
         background: rgba(255, 0, 0, 0.75);
       }
 
-      /* ============================================================
-        PREVIEW STATUS BAR
-        =========================================================== */
+      /* Preview footer */
       .preview-status {
-        text-align: right;
-        margin-top: 10px;
-        color: #535169;
-        font-size: 14px;
-        font-weight: 300;
+        margin-top: 12px;
+        font-size: 13px;
+        color: #4a4a4a;
+      }
+
+      /* CATEGORY DROPDOWN */
+      #categorySuggestions {
+        border: 1px solid #dcdcdc;
+        border-radius: 6px;
+        background: white;
+        margin-top: 2px;
+      }
+
+      .suggestion-item {
+        padding: 10px 14px;
+      }
+
+      .suggestion-create {
+        padding: 10px 14px;
+      }
+
+      /* BUTTONS */
+      .button-row {
+        margin-top: 30px;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        padding: 12px 28px;
+        border-radius: 6px;
+        font-size: 15px;
+        cursor: pointer;
+        border: 1px solid #bfbfbf;
+        transition: 0.2s ease;
       }
 
       .btn-primary:hover,
       .btn-secondary:hover {
-        background: #d7d7d7;
-        color: #000;
+        background: #000000 !important;
+        color: #ffffff !important;
       }
 
-      /* CATEGORY SUGGESTION BOX */
-      #categorySuggestions {
-        position: absolute;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        width: 100%;
-        z-index: 2000;
-        opacity: 0;
-        visibility: hidden;
-        transition: 0.2s ease;
+      .btn-primary:hover {
+        background: #cbcbcb;
       }
 
-      #categorySuggestions.show {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .suggestion-item {
-        padding: 10px;
-        cursor: pointer;
-        transition: background 0.15s ease;
-      }
-
-      .suggestion-item:hover {
-        background: #eef5ff;
-      }
-
-      .suggestion-create {
-        padding: 10px;
-        cursor: pointer;
-        color: #0d6efd;
-        font-weight: 600;
-        border-top: 1px solid #eee;
-      }
-
-      .suggestion-create:hover {
-        background: #e7f1ff;
+      .btn-secondary {
+        background: #f3f3f3;
       }
     </style>
   </head>
