@@ -198,6 +198,7 @@
         margin-top: 30px;
       }
 
+      /* BUTTONS */
       .btn-primary,
       .btn-secondary {
         padding: 12px 28px;
@@ -205,17 +206,27 @@
         font-size: 15px;
         cursor: pointer;
         border: 1px solid #bfbfbf;
-        background: #e6e6e6;
-        color: #222;
-        transition: 0.25s ease;
+        transition: background-color 0.25s ease, color 0.25s ease,
+          transform 0.2s ease;
       }
 
+      /* Default colors */
+      .btn-primary {
+        background: #dcdcdc;
+        color: #000;
+      }
+
+      .btn-secondary {
+        background: #f3f3f3;
+        color: #000;
+      }
+
+      /* HOVER EFFECT (Version 2) */
       .btn-primary:hover,
       .btn-secondary:hover {
-        background: #000 !important;
-        color: #fff !important;
-        border-color: #000;
-        transform: translateY(-1px);
+        background-color: #000; /* pure black */
+        color: #fff; /* pure white */
+        transform: translateY(-2px); /* subtle lift animation */
       }
     </style>
   </head>
