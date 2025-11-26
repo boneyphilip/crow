@@ -45,7 +45,6 @@
       }
 
       /* Inputs */
-      /* Inputs */
       input[type="text"],
       textarea {
         width: 100%;
@@ -106,75 +105,119 @@
         font-weight: 800;
       }
 
-      /* PREVIEW AREA */
+      /* === PREVIEW AREA BOX === */
       .preview-area {
-        background: #ececec;
-        border: 1px solid #d4d4d4;
+        background: #eee;
+        border-top: 1px solid #ccc;
         padding: 14px;
-        margin-top: 12px;
+        margin-top: 10px;
         border-radius: 6px;
         display: none;
       }
 
-      /* IMAGE GRID */
+      /* === IMAGE THUMBNAILS GRID === */
       .thumbnail-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, 100px);
+        display: flex;
         gap: 12px;
+        flex-wrap: wrap;
       }
 
-      /* Thumbnails */
       .thumbnail {
-        width: 100px;
-        height: 100px;
+        width: 74px;
+        height: 74px;
         background: #fff;
-        border: 1px solid #c9c9c9;
+        border: 1px solid #ccc;
         border-radius: 6px;
         overflow: hidden;
         position: relative;
       }
 
-      /* Thumb number */
+      .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* small numbering bottom-left */
       .thumb-number {
         position: absolute;
-        bottom: 4px;
-        left: 4px;
-        padding: 2px 6px;
+        bottom: 3px;
+        left: 3px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
         font-size: 11px;
-        background: rgba(0, 0, 0, 0.75);
+        padding: 2px 5px;
         border-radius: 3px;
       }
 
-      /* Thumbnail remove btn */
+      /* remove image button */
       .remove-btn {
-        top: 4px;
-        right: 4px;
-        background: rgba(0, 0, 0, 0.65);
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        background: rgba(0, 0, 0, 0.8);
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: none;
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
       }
 
-      /* Row items */
+      /* === VIDEO & SOURCE ROWS === */
       .row-item {
-        padding: 11px 11px;
-        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        background: white;
+        border: 1px solid #ccc;
         border-radius: 6px;
-        background: #fff;
-        border: 1px solid #c9c9c9;
+        padding: 8px;
+        margin-top: 10px;
+        position: relative;
       }
 
-      /* Remove row btn */
+      .row-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+      }
+
+      .row-filename {
+        flex: 1;
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* remove video/doc button */
       .remove-row-btn {
-        background: rgba(0, 0, 0, 0.55);
+        position: absolute;
+        top: 50%;
+        right: 6px;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: none;
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
       }
 
-      .remove-row-btn:hover {
+      .preview-status {
+        text-align: right;
+        font-size: 13px;
+        margin-top: 8px;
+        color: #555;
+      }
+      .remove-btn:hover {
         background: rgba(255, 0, 0, 0.75);
       }
-
-      /* Preview footer */
-      .preview-status {
-        margin-top: 12px;
-        font-size: 13px;
-        color: #4a4a4a;
+      .remove-row-btn:hover {
+        background: rgba(255, 0, 0, 0.75);
       }
 
       /* CATEGORY DROPDOWN */
@@ -324,24 +367,16 @@
     </div>
 
     <script>
-      /* ===============================================================
-        WORD COUNT
-        ================================================================ */
+      /* Word counter */
       document.getElementById("summary").addEventListener("input", function () {
         const words = this.value.trim().split(/\s+/).filter(Boolean).length;
         document.getElementById("wordCount").textContent =
           "Word count: " + words;
       });
 
-      /* ===============================================================
-        ELEMENT REFERENCES
-        ================================================================ */
+      /* Preview logic */
       const previewArea = document.getElementById("previewArea");
       const previewStatus = document.getElementById("previewStatusBar");
-
-      const addImageBtn = document.getElementById("addImageBtn");
-      const addVideoBtn = document.getElementById("addVideoBtn");
-      const addSourceBtn = document.getElementById("addSourceBtn");
 
       const imageInput = document.getElementById("imageInput");
       const videoInput = document.getElementById("videoInput");
@@ -350,50 +385,40 @@
       const thumbnailContainer = document.getElementById("thumbnailContainer");
       const combinedPreview = document.getElementById("combinedPreview");
 
-      // counters
-      let imgCount = 0;
-      let vidCount = 0;
-      let srcCount = 0;
+      let imgCount = 0,
+        vidCount = 0,
+        srcCount = 0;
 
-      /* ===============================================================
-        HELPERS
-        ================================================================ */
       function showBox() {
         previewArea.style.display = "block";
       }
-
       function updateStatus() {
         previewStatus.textContent = `Images: ${imgCount} | Video: ${vidCount} | Sources: ${srcCount}`;
       }
-
       function hideIfEmpty() {
         if (imgCount === 0 && vidCount === 0 && srcCount === 0) {
           previewArea.style.display = "none";
         }
       }
 
-      /* ===============================================================
-        IMAGE HANDLING
-        ================================================================ */
-      addImageBtn.onclick = () => imageInput.click();
+      /* === ADD IMAGES === */
+      document.getElementById("addImageBtn").onclick = () => imageInput.click();
 
       imageInput.addEventListener("change", () => {
         if (!imageInput.files.length) return;
+
         showBox();
 
         Array.from(imageInput.files).forEach((file) => {
           const reader = new FileReader();
-
           reader.onload = (e) => {
             const div = document.createElement("div");
             div.className = "thumbnail";
-
             div.innerHTML = `
                 <img src="${e.target.result}">
                 <div class="thumb-number">${imgCount + 1}</div>
                 <button class="remove-btn">&times;</button>
             `;
-
             thumbnailContainer.appendChild(div);
             imgCount++;
             updateStatus();
@@ -401,28 +426,25 @@
             div.querySelector(".remove-btn").onclick = () => {
               div.remove();
               imgCount--;
-              renumberImages();
+              renumber();
               updateStatus();
               hideIfEmpty();
             };
           };
-
           reader.readAsDataURL(file);
         });
 
         imageInput.value = "";
       });
 
-      function renumberImages() {
+      function renumber() {
         document
           .querySelectorAll(".thumb-number")
-          .forEach((num, i) => (num.textContent = i + 1));
+          .forEach((n, i) => (n.textContent = i + 1));
       }
 
-      /* ===============================================================
-        VIDEO HANDLING (ONLY ONE)
-        ================================================================ */
-      addVideoBtn.onclick = () => videoInput.click();
+      /* === ADD VIDEO === */
+      document.getElementById("addVideoBtn").onclick = () => videoInput.click();
 
       videoInput.addEventListener("change", () => {
         if (!videoInput.files.length) return;
@@ -444,7 +466,6 @@
         <svg class="row-icon" viewBox="0 0 24 24">
             <path d="M17 10.5V7a2 2 0 0 0-2-2H5A2 2 0 0 0 3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
         </svg>
-
         <span class="row-filename">${file.name}</span>
         <button class="remove-row-btn">&times;</button>
     `;
@@ -463,10 +484,9 @@
         videoInput.value = "";
       });
 
-      /* ===============================================================
-        SOURCE DOCUMENT HANDLING (ANY FILES)
-        ================================================================ */
-      addSourceBtn.onclick = () => sourceInput.click();
+      /* === ADD SOURCE === */
+      document.getElementById("addSourceBtn").onclick = () =>
+        sourceInput.click();
 
       sourceInput.addEventListener("change", () => {
         if (!sourceInput.files.length) return;
@@ -481,7 +501,6 @@
             <svg class="row-icon" viewBox="0 0 24 24">
                 <path d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
             </svg>
-
             <span class="row-filename">${file.name}</span>
             <button class="remove-row-btn">&times;</button>
         `;
