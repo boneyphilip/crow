@@ -1,0 +1,39 @@
+{% load static %} {% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crow — Community Feed</title>
+
+    <!-- Home Page CSS -->
+    <link rel="stylesheet" href="{% static 'posts/css/home.css' %}" />
+
+    <!-- Optional clean font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- MAIN FEED CONTAINER -->
+    <div class="feed-wrapper">
+      <h1 class="page-title">Crow 🪶 Community Feed</h1>
+
+      <!-- SUCCESS MESSAGES -->
+      {% if messages %} {% for message in messages %}
+      <div class="flash-message">{{ message }}</div>
+      {% endfor %} {% endif %}
+
+      <!-- POST FEED LIST -->
+      <div class="post-list">
+        {% for post in posts %}
+        <!-- We will fill this later in Part 9-C -->
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Home JS -->
+    <script src="{% static 'posts/js/home.js' %}"></script>
+  </body>
+</html>
