@@ -1,0 +1,283 @@
+/* ======================
+   GLOBAL PAGE LAYOUT
+====================== */
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 60px 0;
+}
+
+/* MAIN CARD */
+.container {
+  max-width: 760px;
+  margin: auto;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  padding: 45px 52px 60px 52px;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* PAGE TITLE */
+h1 {
+  font-size: 32px;
+  margin-bottom: 30px;
+  font-weight: 400;
+}
+
+/* FORM GROUP */
+.form-group {
+  margin-bottom: 26px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* INPUTS */
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 14px;
+  font-size: 15.5px;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  background: #fcfcfc;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* FOCUS BEHAVIOR (Reddit-style) */
+input[type="text"]:focus,
+textarea:focus,
+#categoryInput:focus {
+  border: 2px solid #000;
+  outline: none;
+  box-shadow: none;
+  background: #ffffff;
+}
+
+/* TEXTAREA */
+textarea {
+  height: 130px;
+  resize: none;
+  padding-bottom: 28px;
+}
+
+/* WORD COUNT */
+.textarea-wrapper {
+  position: relative;
+}
+
+.word-count {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 12px;
+  color: #777;
+}
+
+/* ADD-BAR */
+.add-bar {
+  display: flex;
+  gap: 25px;
+  padding: 15px 12px;
+  background: #e8e8e8;
+  border-top: 1px solid #ddd;
+  margin-top: 8px;
+  border-radius: 6px;
+}
+
+.add-bar span {
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.plus {
+  color: #2ecc71;
+  font-weight: 700;
+}
+
+/* PREVIEW BOX */
+.preview-area {
+  background: #eee;
+  border-top: 1px solid #ccc;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  display: none;
+}
+
+/* IMAGE GRID */
+.thumbnail-container {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.thumbnail {
+  width: 74px;
+  height: 74px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* NUMBER */
+.thumb-number {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+/* REMOVE IMAGE BUTTON */
+.remove-btn {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  background: rgba(0, 0, 0, 0.85);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background: rgba(255, 0, 0, 0.75);
+}
+
+/* VIDEO / SOURCE ROW STYLE */
+.row-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 10px;
+  position: relative;
+}
+
+.row-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.row-filename {
+  flex: 1;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.remove-row-btn {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.remove-row-btn:hover {
+  background: rgba(255, 0, 0, 0.75);
+}
+
+/* PREVIEW STATUS */
+.preview-status {
+  text-align: right;
+  font-size: 13px;
+  margin-top: 8px;
+  color: #555;
+}
+
+/* CATEGORY INPUT */
+#categoryInput {
+  padding: 14px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* CATEGORY DROPDOWN */
+#categorySuggestions {
+  width: 100%;
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 4px;
+  display: none;
+  z-index: 999;
+}
+
+#categorySuggestions.show {
+  display: block;
+}
+
+.suggestion-item,
+.suggestion-create {
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.suggestion-item:hover,
+.suggestion-create:hover {
+  background: #f0f0f0;
+}
+
+/* BUTTON ROW */
+.button-row {
+  margin-top: 30px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-size: 15px;
+  border: 1px solid #bfbfbf;
+  background: #eee;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, transform 0.2s;
+}
+
+.btn-secondary {
+  margin-left: 12px;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  background: #000;
+  color: #fff;
+  transform: translateY(-2px);
+}
