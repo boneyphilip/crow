@@ -25,11 +25,56 @@
       <div class="flash-message">{{ message }}</div>
       {% endfor %} {% endif %}
 
-      <!-- POST FEED LIST -->
-      <div class="post-list">
-        {% for post in posts %}
-        <!-- We will fill this later in Part 9-C -->
-        {% endfor %}
+{% for post in posts %}
+<div class="post-card">
+
+    <!-- POST HEADER -->
+    <div class="post-header">
+        <img src="https://ui-avatars.com/api/?name={{ post.author.username }}" class="post-avatar" />
+
+        <div class="post-meta">
+            <span class="post-author">{{ post.author.username }}</span>
+            <span class="post-time">• {{ post.created_at|naturaltime }}</span>
+
+            {% if post.category %}
+            <span class="post-category">{{ post.category.name }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- POST TITLE -->
+    <h2 class="post-title">{{ post.title }}</h2>
+
+    <!-- POST CONTENT -->
+    <p class="post-content">{{ post.content }}</p>
+
+    <!-- ACTION BAR (LIKE REDDIT) -->
+    <div class="post-actions">
+
+        <!-- UPVOTE -->
+        <form action="{% url 'upvote_post' post.id %}" method="post" class="vote-box">
+            {% csrf_token %}
+            <button type="submit" class="vote-btn">▲</button>
+            <span class="vote-count">{{ post.upvotes }}</span>
+        </form>
+
+        <!-- COMMENTS -->
+        <div class="action-btn">
+            💬 <span>Comments</span>
+        </div>
+
+        <!-- SHARE -->
+        <div class="action-btn">
+            ↗ <span>Share</span>
+        </div>
+
+    </div>
+
+</div>
+{% empty %}
+<p class="no-posts">No posts yet. Be the first to share something!</p>
+{% endfor %}
+
       </div>
     </div>
 
