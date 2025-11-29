@@ -1,42 +1,158 @@
-/* ============================
-   HOME PAGE — BASE STYLES
-   ============================ */
+/* ============================================================ 
+   HOME FEED — CLEAN REDDIT STYLE LAYOUT
+   ============================================================ */
 
 body {
-  background: #f6f7f8;
-  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background: #f3f4f6;
+  font-family: "Inter", sans-serif;
   margin: 0;
-  padding: 40px 0;
+  padding: 0;
 }
 
-/* Container for whole feed */
+/* ---- Center main content ---- */
 .feed-wrapper {
-  max-width: 760px;
-  margin: auto;
+  width: 780px;
+  margin: 40px auto;
 }
 
-/* Page title */
 .page-title {
-  font-size: 32px;
-  margin-bottom: 35px;
-  font-weight: 700;
-  color: #1a1a1b;
   text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 35px;
 }
 
-/* Flash messages */
+/* Flash message */
 .flash-message {
-  background: #d4edda;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
   padding: 12px 16px;
-  border: 1px solid #c3e6cb;
-  color: #155724;
+  margin-bottom: 20px;
   border-radius: 6px;
-  margin-bottom: 16px;
+  color: #065f46;
+  font-size: 15px;
 }
 
-/* Post list wrapper */
-.post-list {
+/* ============================================================
+   POST CARD
+   ============================================================ */
+.post-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 26px;
+  margin-bottom: 30px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Header */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.post-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.post-meta {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  font-size: 14px;
+  color: #555;
+}
+
+.post-meta span:first-child {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.post-category {
+  margin-top: 4px;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* Title */
+.post-title {
+  font-size: 22px;
+  margin-bottom: 14px;
+  color: #111;
+}
+
+/* Content */
+.post-content {
+  font-size: 15px;
+  line-height: 1.55;
+  margin-bottom: 28px;
+  color: #333;
+}
+
+/* ============================================================
+   BOTTOM ACTION BAR
+   ============================================================ */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+/* Vote Box */
+.vote-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f3f4f6;
+  padding: 8px 16px;
+  border-radius: 12px;
+}
+
+.vote-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
+  transition: 0.15s;
+}
+
+.vote-btn:hover {
+  color: #000;
+}
+
+.vote-count {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Comments / Share */
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  color: #444;
+}
+
+.action-btn:hover {
+  color: #000;
+}
+
+.action-item {
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.action-item:hover {
+  color: #000;
 }
