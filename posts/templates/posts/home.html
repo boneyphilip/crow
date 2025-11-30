@@ -55,15 +55,15 @@
 
         <!-- Upvote box -->
         <div class="vote-box">
-            <button class="vote-btn">▲</button>
-            <span class="vote-count">{{ post.upvotes }}</span>
-            <button class="vote-btn">▼</button>
+    <button class="vote-btn" data-action="up" data-post-id="{{ post.id }}">▲</button>
+
+    <span class="vote-count" id="vote-count-{{ post.id }}">
+        {{ post.upvotes }}
+    </span>
+
+    <button class="vote-btn" data-action="down" data-post-id="{{ post.id }}">▼</button>
         </div>
 
-        <!-- COMMENT COUNT (Correct) -->
-        <div class="action-btn">
-            💬 <a href="{% url 'post_detail' post.id %}">{{ post.comments.count }} Comments</a>
-        </div>
 
         <!-- SHARE -->
         <div class="action-btn">
