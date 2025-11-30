@@ -25,6 +25,10 @@ urlpatterns = [
     # -----------------------------------------------
     path('create/', views.create_post, name='create_post'),
 
+    # -----------------------------------------------
+    #  NEW: Post Detail Page
+    # -----------------------------------------------
+    path('post/<int:post_id>/', views.post_detail, name='post_detail'),
 
 
     # -----------------------------------------------
@@ -62,8 +66,13 @@ urlpatterns = [
     path('categories/create/', views.ajax_create_category,
          name='ajax_create_category'),
 
+    # -----------------------------------------------
+    #  Add Comment
+    # -----------------------------------------------
     path("comment/<int:post_id>/", views.add_comment, name="add_comment"),
 
+    # -----------------------------------------------
+    #  Reply to Comment
+    # -----------------------------------------------
     path("reply/<int:comment_id>/", views.reply_comment, name="reply_comment"),
-
 ]
