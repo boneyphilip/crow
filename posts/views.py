@@ -1,5 +1,6 @@
 # posts/views.py
 
+from .models import Comment
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -123,3 +124,56 @@ def ajax_create_category(request):
         })
 
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+
+# ==================================================
+# ADD COMMENT (Top-level comment)
+# ==================================================
+
+
+def add_comment(request, post_id):
+    if request.method == "POST":
+        post = get_object_or_404(Post, id=post_id)
+        content = request.POST.get("content", "").strip()
+
+        if not content:
+            messages.error(request, "Comment cannot be empty.")
+            return redirect("home")
+
+        Comment.objects.create(
+            post=post,
+            author=request.user if request.user.is_authenticated else User.objects.first(),
+            content=content,
+            parent=None
+        )
+
+        messages.success(request, "Comment added!")
+        return redirect("home")
+
+    return redirect("home")
+
+
+# ==================================================
+# ADD REPLY (One-level nested reply)
+# ==================================================
+def reply_comment(request, comment_id):
+    if request.method == "POST":
+        parent_comment = get_object_or_404(Comment, id=comment_id)
+        post = parent_comment.post
+        content = request.POST.get("content", "").strip()
+
+        if not content:
+            messages.error(request, "Reply cannot be empty.")
+            return redirect("home")
+
+        Comment.objects.create(
+            post=post,
+            author=request.user if request.user.is_authenticated else User.objects.first(),
+            content=content,
+            parent=parent_comment
+        )
+
+        messages.success(request, "Reply added!")
+        return redirect("home")
+
+    return redirect("home")

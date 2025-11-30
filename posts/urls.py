@@ -61,4 +61,9 @@ urlpatterns = [
     # This instantly creates the new category in the database.
     path('categories/create/', views.ajax_create_category,
          name='ajax_create_category'),
+
+    path("comment/<int:post_id>/", views.add_comment, name="add_comment"),
+
+    path("reply/<int:comment_id>/", views.reply_comment, name="reply_comment"),
+
 ]
