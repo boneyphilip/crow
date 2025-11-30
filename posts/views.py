@@ -186,3 +186,34 @@ def reply_comment(request, comment_id):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     return render(request, "posts/post_detail.html", {"post": post})
+
+# ==================================================
+# AJAX VOTING (Upvote & Downvote)
+# ==================================================
+
+
+def vote_post(request, post_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    post = get_object_or_404(Post, id=post_id)
+    action = request.POST.get("action")
+
+    # Upvote
+    if action == "upvote":
+        post.upvotes += 1
+        post.score += 1
+        post.save()
+
+    # Downvote
+    elif action == "downvote":
+        post.score -= 1
+        post.save()
+
+    else:
+        return JsonResponse({"error": "Unknown action"}, status=400)
+
+    return JsonResponse({
+        "upvotes": post.upvotes,
+        "score": post.score
+    })

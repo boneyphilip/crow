@@ -50,6 +50,11 @@ urlpatterns = [
          views.ajax_upvote_post, name='ajax_upvote_post'),
 
     # -----------------------------------------------
+    #  NEW: AJAX Vote (Upvote + Downvote)
+    # -----------------------------------------------
+    path("ajax/vote/<int:post_id>/", views.vote_post, name="ajax_vote"),
+
+    # -----------------------------------------------
     #  Category Search API (AJAX)
     # -----------------------------------------------
     # Called automatically while typing in the "Category" input box.
