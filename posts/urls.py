@@ -40,19 +40,10 @@ urlpatterns = [
     path('upvote/<int:post_id>/', views.upvote_post, name='upvote_post'),
 
     # -----------------------------------------------
-    #  AJAX Upvote (Instant)
-    # -----------------------------------------------
-    # This version uses JavaScript (no page reload).
-    # The frontend JS calls this route with a POST request.
-    # Example URL: /ajax/upvote/3/
-    # It runs the ajax_upvote_post() view.
-    path('ajax/upvote/<int:post_id>/',
-         views.ajax_upvote_post, name='ajax_upvote_post'),
-
-    # -----------------------------------------------
     #  NEW: AJAX Vote (Upvote + Downvote)
     # -----------------------------------------------
-    path("ajax/vote/<int:post_id>/", views.vote_post, name="ajax_vote"),
+    path("ajax/vote/<int:post_id>/", views.ajax_vote, name="ajax_vote"),
+
 
     # -----------------------------------------------
     #  Category Search API (AJAX)

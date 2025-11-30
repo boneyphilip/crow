@@ -1,5 +1,7 @@
 # posts/views.py
 
+import json
+from django.views.decorators.csrf import csrf_exempt
 from .models import Comment
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
@@ -72,19 +74,6 @@ def upvote_post(request, post_id):
     post.upvotes += 1
     post.save()
     return redirect("home")
-
-
-# ==================================================
-# AJAX UPVOTE
-# ==================================================
-def ajax_upvote_post(request, post_id):
-    if request.method == "POST":
-        post = get_object_or_404(Post, id=post_id)
-        post.upvotes += 1
-        post.save()
-        return JsonResponse({"upvotes": post.upvotes})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 # ==================================================
@@ -192,28 +181,23 @@ def post_detail(request, post_id):
 # ==================================================
 
 
-def vote_post(request, post_id):
+def ajax_vote(request, post_id):
     if request.method != "POST":
-        return JsonResponse({"error": "Invalid request"}, status=400)
+        return JsonResponse({"success": False, "error": "Invalid method"}, status=400)
 
     post = get_object_or_404(Post, id=post_id)
-    action = request.POST.get("action")
 
-    # Upvote
-    if action == "upvote":
+    data = json.loads(request.body.decode("utf-8"))
+    action = data.get("action")
+
+    # Increase or decrease upvotes
+    if action == "up":
         post.upvotes += 1
-        post.score += 1
-        post.save()
-
-    # Downvote
-    elif action == "downvote":
-        post.score -= 1
-        post.save()
-
+    elif action == "down":
+        post.upvotes = max(0, post.upvotes - 1)
     else:
-        return JsonResponse({"error": "Unknown action"}, status=400)
+        return JsonResponse({"success": False, "error": "Invalid action"}, status=400)
 
-    return JsonResponse({
-        "upvotes": post.upvotes,
-        "score": post.score
-    })
+    post.save()
+
+    return JsonResponse({"success": True, "upvotes": post.upvotes})
