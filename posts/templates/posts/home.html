@@ -23,62 +23,70 @@
       <!-- SUCCESS MESSAGES -->
       {% if messages %} {% for message in messages %}
       <div class="flash-message">{{ message }}</div>
-      {% endfor %} {% endif %}
+      {% endfor %} {% endif %} {% for post in posts %}
+      <div class="post-card">
+        <!-- POST HEADER -->
+        <div class="post-header">
+          <img
+            src="https://ui-avatars.com/api/?name={{ post.author.username }}"
+            class="post-avatar"
+          />
 
-{% for post in posts %}
-<div class="post-card">
-
-    <!-- POST HEADER -->
-    <div class="post-header">
-        <img src="https://ui-avatars.com/api/?name={{ post.author.username }}" class="post-avatar" />
-
-        <div class="post-meta">
+          <div class="post-meta">
             <span class="post-author">{{ post.author.username }}</span>
-            <span class="post-time">• {{ post.created_at|naturaltime|clean_time }}</span>
+            <span class="post-time"
+              >• {{ post.created_at|naturaltime|clean_time }}</span
+            >
 
             {% if post.category %}
             <span class="post-category">{{ post.category.name }}</span>
             {% endif %}
-        </div>
-    </div>
-
-    <!-- POST TITLE -->
-    <h2 class="post-title">{{ post.title }}</h2>
-
-    <!-- POST CONTENT -->
-    <p class="post-content">
-        {{ post.content|truncatechars:250 }}  
-    </p>
-
-    <!-- ACTION BAR -->
-    <div class="post-actions">
-
-        <!-- Upvote box -->
-        <div class="vote-box">
-    <button class="vote-btn" data-action="up" data-post-id="{{ post.id }}">▲</button>
-
-    <span class="vote-count" id="vote-count-{{ post.id }}">
-        {{ post.upvotes }}
-    </span>
-
-    <button class="vote-btn" data-action="down" data-post-id="{{ post.id }}">▼</button>
+          </div>
         </div>
 
+        <!-- POST TITLE -->
+        <h2 class="post-title">{{ post.title }}</h2>
 
-        <!-- SHARE -->
-        <div class="action-btn">
-            ↗ <span>Share</span>
+        <!-- POST CONTENT -->
+        <p class="post-content">{{ post.content|truncatechars:250 }}</p>
+
+        <!-- ACTION BAR -->
+        <div class="post-actions">
+          <!-- Upvote box -->
+          <div class="vote-box">
+            <button
+              class="vote-btn"
+              data-post-id="{{ post.id }}"
+              data-action="upvote"
+            >
+              ▲
+            </button>
+
+            <span class="vote-count" id="vote-count-{{ post.id }}">
+              {{ post.score }}
+            </span>
+
+            <button
+              class="vote-btn"
+              data-post-id="{{ post.id }}"
+              data-action="downvote"
+            >
+              ▼
+            </button>
+          </div>
+
+          <!-- COMMENTS COUNT -->
+          <a href="{% url 'post_detail' post.id %}" class="action-btn">
+            💬 {{ post.comments.count }}
+          </a>
+
+          <div class="action-btn">↗ Share</div>
         </div>
-
-    </div>
-
-</div>
-
-{% empty %}
-<p class="no-posts">No posts yet. Be the first to share something!</p>
-{% endfor %}
-
       </div>
+
+      {% empty %}
+      <p class="no-posts">No posts yet. Be the first to share something!</p>
+      {% endfor %} <
     </div>
 
     <!-- Home JS -->

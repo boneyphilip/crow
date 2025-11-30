@@ -183,21 +183,22 @@ def post_detail(request, post_id):
 
 def ajax_vote(request, post_id):
     if request.method != "POST":
-        return JsonResponse({"success": False, "error": "Invalid method"}, status=400)
+        return JsonResponse({"error": "Invalid request"}, status=400)
 
     post = get_object_or_404(Post, id=post_id)
+    action = request.POST.get("action")  # <-- FIXED. Reads form data.
 
-    data = json.loads(request.body.decode("utf-8"))
-    action = data.get("action")
-
-    # Increase or decrease upvotes
-    if action == "up":
+    if action == "upvote":
         post.upvotes += 1
-    elif action == "down":
-        post.upvotes = max(0, post.upvotes - 1)
+        post.score += 1
+    elif action == "downvote":
+        post.score -= 1
     else:
-        return JsonResponse({"success": False, "error": "Invalid action"}, status=400)
+        return JsonResponse({"error": "Invalid action"}, status=400)
 
     post.save()
 
-    return JsonResponse({"success": True, "upvotes": post.upvotes})
+    return JsonResponse({
+        "upvotes": post.upvotes,
+        "score": post.score
+    })
