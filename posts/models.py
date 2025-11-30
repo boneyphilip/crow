@@ -40,6 +40,8 @@ class Post(models.Model):
     #  Count of upvotes (starts from 0)
     upvotes = models.PositiveIntegerField(default=0)
 
+    score = models.IntegerField(default=0)
+
     def __str__(self):
         # When you print(Post), show title and author
         return f"{self.title} by {self.author.username}"
