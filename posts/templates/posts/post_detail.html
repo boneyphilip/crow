@@ -1,0 +1,118 @@
+{% load static %} {% load humanize %} {% load time_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ post.title }} — Crow</title>
+    <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}" />
+  </head>
+
+  <body>
+    <a href="/" class="back-link">← Back to Home</a>
+
+    <!-- MAIN POST CARD -->
+    <div class="post-card">
+      <div class="post-header">
+        <img
+          src="https://ui-avatars.com/api/?name={{ post.author.username }}"
+          class="post-avatar"
+        />
+
+        <div class="post-meta">
+          <span class="post-author">{{ post.author.username }}</span>
+          <span class="post-time"
+            >• {{ post.created_at|naturaltime|clean_time }}</span
+          >
+
+          {% if post.category %}
+          <span class="post-category">{{ post.category.name }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <h1 class="post-title">{{ post.title }}</h1>
+      <p class="post-content">{{ post.content }}</p>
+
+      <div class="post-actions">
+        <div class="vote-box">
+          <button class="vote-btn">▲</button>
+          <span class="vote-count">{{ post.upvotes }}</span>
+          <button class="vote-btn">▼</button>
+        </div>
+
+        <div class="comment-count">💬 {{ post.comments.count }} Comments</div>
+
+        <div class="share-btn">↗ Share</div>
+      </div>
+    </div>
+
+    <!-- COMMENTS CARD -->
+    <div class="comments-card">
+      <h2 class="comments-title">Comments</h2>
+
+      <!-- ADD COMMENT FORM -->
+      <form
+        method="post"
+        action="{% url 'add_comment' post.id %}"
+        class="comment-form"
+      >
+        {% csrf_token %}
+        <textarea
+          name="content"
+          class="comment-input"
+          placeholder="Write a comment..."
+        ></textarea>
+        <button class="comment-submit">Comment</button>
+      </form>
+
+      <div class="comment-list">
+        {% for comment in post.comments.all %}
+        <div class="comment-box">
+          <div class="comment-info">
+            <span class="comment-author">{{ comment.author.username }}</span>
+            <span class="comment-time"
+              >• {{ comment.created_at|naturaltime|clean_time }}</span
+            >
+          </div>
+
+          <p class="comment-text">{{ comment.content }}</p>
+
+          <!-- Reply Button -->
+          <button class="reply-toggle" data-id="{{ comment.id }}">Reply</button>
+
+          <!-- Reply Form -->
+          <form
+            method="post"
+            action="{% url 'reply_comment' comment.id %}"
+            id="reply-form-{{ comment.id }}"
+            class="reply-form"
+          >
+            {% csrf_token %}
+            <textarea
+              name="content"
+              class="reply-input"
+              placeholder="Write a reply..."
+            ></textarea>
+            <button class="reply-submit">Reply</button>
+          </form>
+
+          <!-- Replies -->
+          {% for reply in comment.replies.all %}
+          <div class="reply-box">
+            <div class="reply-info">
+              <span class="reply-author">{{ reply.author.username }}</span>
+              <span class="reply-time"
+                >• {{ reply.created_at|naturaltime|clean_time }}</span
+              >
+            </div>
+
+            <p class="reply-text">{{ reply.content }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>

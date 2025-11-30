@@ -177,3 +177,12 @@ def reply_comment(request, comment_id):
         return redirect("home")
 
     return redirect("home")
+
+# ==================================================
+# POST DETAIL PAGE (Single Post Page)
+# ==================================================
+
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    return render(request, "posts/post_detail.html", {"post": post})

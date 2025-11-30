@@ -45,7 +45,7 @@ class Post(models.Model):
         return f"{self.title} by {self.author.username}"
 
 # -----------------------------
-# Comment Model (
+# Comment Model
 # -----------------------------
 
 
