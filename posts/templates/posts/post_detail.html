@@ -44,8 +44,8 @@
             ▲
           </button>
 
-          <span class="vote-count" id="detail-vote-count-{{ post.id }}">
-            {{ post.score }}
+          <span class="vote-count" id="detail-vote-count">
+            {{ post.upvotes }}
           </span>
 
           <button
@@ -103,6 +103,7 @@
             action="{% url 'reply_comment' comment.id %}"
             id="reply-form-{{ comment.id }}"
             class="reply-form"
+            style="display: none"
           >
             {% csrf_token %}
             <textarea
@@ -130,5 +131,6 @@
         {% endfor %}
       </div>
     </div>
+    <script src="{% static 'posts/js/post_detail.js' %}"></script>
   </body>
 </html>

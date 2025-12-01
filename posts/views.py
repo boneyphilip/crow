@@ -153,7 +153,7 @@ def reply_comment(request, comment_id):
 
         if not content:
             messages.error(request, "Reply cannot be empty.")
-            return redirect("home")
+            return redirect("post_detail", post_id=post.id)
 
         Comment.objects.create(
             post=post,
@@ -163,9 +163,10 @@ def reply_comment(request, comment_id):
         )
 
         messages.success(request, "Reply added!")
-        return redirect("home")
+        return redirect("post_detail", post_id=post.id)
 
     return redirect("home")
+
 
 # ==================================================
 # POST DETAIL PAGE (Single Post Page)

@@ -1,3 +1,6 @@
+/* ==========================================================
+   GLOBAL
+   ========================================================== */
 body {
   background: #f3f4f6;
   font-family: "Inter", sans-serif;
@@ -5,24 +8,32 @@ body {
   padding: 30px;
 }
 
+/* ==========================================================
+   BACK LINK
+   ========================================================== */
 .back-link {
-  display: block;
+  display: inline-block;
   margin-bottom: 20px;
-  color: #444;
+  color: #4b5563;
   text-decoration: none;
+  font-size: 15px;
 }
 
 .back-link:hover {
   color: #000;
 }
 
+/* ==========================================================
+   MAIN POST CARD
+   ========================================================== */
 .post-card {
   background: white;
-  padding: 30px;
   width: 780px;
   margin: 0 auto 30px auto;
+  padding: 30px;
   border-radius: 16px;
   border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 /* HEADER */
@@ -61,21 +72,20 @@ body {
   margin-top: 5px;
 }
 
-/* POST TITLE */
+/* TITLE + CONTENT */
 .post-title {
   font-size: 28px;
   font-weight: 700;
   margin-top: 20px;
 }
 
-/* CONTENT */
 .post-content {
   font-size: 17px;
   margin-top: 12px;
   margin-bottom: 20px;
 }
 
-/* ACTION BAR */
+/* POST ACTIONS */
 .post-actions {
   display: flex;
   align-items: center;
@@ -88,7 +98,7 @@ body {
 .vote-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: #f3f4f6;
   padding: 8px 16px;
   border-radius: 12px;
@@ -101,7 +111,30 @@ body {
   font-size: 20px;
 }
 
-/* COMMENTS CARD */
+.vote-btn:hover {
+  color: black;
+}
+
+.vote-count {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.comment-count,
+.share-btn {
+  font-size: 15px;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.comment-count:hover,
+.share-btn:hover {
+  color: #000;
+}
+
+/* ==========================================================
+   COMMENTS SECTION
+   ========================================================== */
 .comments-card {
   background: white;
   width: 780px;
@@ -109,12 +142,13 @@ body {
   padding: 25px;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .comments-title {
-  margin-bottom: 15px;
   font-size: 22px;
   font-weight: 600;
+  margin-bottom: 15px;
 }
 
 /* COMMENT FORM */
@@ -126,13 +160,12 @@ body {
 
 .comment-input {
   width: 100%;
-  box-sizing: border-box; /* VERY IMPORTANT: include padding in width */
   padding: 14px;
   border-radius: 10px;
   border: 1px solid #d1d5db;
   font-size: 16px;
   resize: vertical;
-  margin-bottom: 12px;
+  box-sizing: border-box;
 }
 
 .comment-submit {
@@ -144,15 +177,19 @@ body {
   cursor: pointer;
   font-size: 15px;
 }
+
 .comment-submit:hover {
   opacity: 0.85;
 }
 
-/* COMMENT LIST */
+/* ==========================================================
+   COMMENT LIST
+   ========================================================== */
 .comment-box {
   margin-top: 25px;
   padding-bottom: 20px;
   border-bottom: 1px solid #eee;
+  padding-right: 10px; /* FIX */
 }
 
 .comment-info {
@@ -177,29 +214,34 @@ body {
   color: #4b5563;
   cursor: pointer;
   font-size: 14px;
+  margin-bottom: 5px;
 }
 
 .reply-toggle:hover {
-  color: black;
+  color: #000;
 }
 
-/* REPLY FORM */
+/* ==========================================================
+   REPLY FORM
+   ========================================================== */
 .reply-form {
-  margin-top: 10px;
+  margin-top: 12px;
   display: none;
 }
 
 .reply-input {
   width: 100%;
+  max-width: calc(100% - 10px); /* FIX */
   min-height: 60px;
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
   resize: vertical;
 }
 
 .reply-submit {
-  margin-top: 5px;
+  margin-top: 6px;
   padding: 7px 15px;
   background: #111;
   color: white;
@@ -208,10 +250,17 @@ body {
   cursor: pointer;
 }
 
-/* REPLY BOX */
+.reply-submit:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================
+   REPLIES
+   ========================================================== */
 .reply-box {
   margin-left: 30px;
   margin-top: 18px;
+  padding-right: 10px; /* FIX */
 }
 
 .reply-info {
