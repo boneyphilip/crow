@@ -17,17 +17,18 @@ from .forms import PostForm
 
 
 # ==================================================
-# HOME PAGE — shows posts, handles simple form post
+# HOME PAGE — shows posts + SEARCH + form POST
 # ==================================================
 def home(request):
 
+    # If someone submits the post form
     if request.method == "POST":
         form = PostForm(request.POST)
 
         if form.is_valid():
             post = form.save(commit=False)
 
-            # Assign author (fallback: first user)
+            # Author of the post
             post.author = request.user if request.user.is_authenticated else User.objects.first()
             post.created_at = timezone.now()
 
@@ -44,7 +45,6 @@ def home(request):
 
                 post.category = category
 
-            # Save post
             post.save()
 
             messages.success(
@@ -54,8 +54,18 @@ def home(request):
     else:
         form = PostForm()
 
-    posts = Post.objects.all().order_by("-created_at")
+    # ==============================
+    # 🔍 SEARCH LOGIC
+    # ==============================
+    query = request.GET.get("q")
 
+    if query:
+        posts = Post.objects.filter(
+            title__icontains=query).order_by("-created_at")
+    else:
+        posts = Post.objects.all().order_by("-created_at")
+
+    # Render home page
     return render(request, "posts/home.html", {
         "form": form,
         "posts": posts
