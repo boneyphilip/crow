@@ -61,23 +61,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (!data.success) return;
 
-          // Update UI
-          document.getElementById("detail-vote-count").textContent =
-            data.upvotes;
+          // Correct ID update
+          const count = document.getElementById(`detail-vote-count-${postId}`);
+          if (count) {
+            count.textContent = data.upvotes;
+          }
         })
         .catch((err) => console.error("Vote error:", err));
     });
   });
 });
-
-// CSRF helper
-function getCookie(name) {
-  let cookieValue = null;
-  document.cookie.split(";").forEach((cookie) => {
-    cookie = cookie.trim();
-    if (cookie.startsWith(name + "=")) {
-      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-    }
-  });
-  return cookieValue;
-}
