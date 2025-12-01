@@ -20,6 +20,7 @@ urlpatterns = [
     # This page shows all posts and has the "Create Post" form.
     path('', views.home, name='home'),
     path("login/", auth_views.LoginView.as_view(template_name="posts/login.html"), name="login"),
+    path("register/", views.register_user, name="register"),
 
     # -----------------------------------------------
     #  Create Post Page

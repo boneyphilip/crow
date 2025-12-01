@@ -1,4 +1,6 @@
 # posts/views.py
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 import json
@@ -286,3 +288,18 @@ def edit_comment(request, comment_id):
         return redirect("post_detail", post_id=comment.post.id)
 
     return render(request, "posts/edit_comment.html", {"comment": comment})
+
+# ===============================================================================#
+
+
+def register_user(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # auto-login after signup
+            return redirect("home")
+    else:
+        form = UserCreationForm()
+
+    return render(request, "posts/register.html", {"form": form})
