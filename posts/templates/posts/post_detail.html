@@ -36,9 +36,25 @@
 
       <div class="post-actions">
         <div class="vote-box">
-          <button class="vote-btn">▲</button>
-          <span class="vote-count">{{ post.upvotes }}</span>
-          <button class="vote-btn">▼</button>
+          <button
+            class="vote-btn"
+            data-post-id="{{ post.id }}"
+            data-action="upvote"
+          >
+            ▲
+          </button>
+
+          <span class="vote-count" id="detail-vote-count">
+            {{ post.upvotes }}
+          </span>
+
+          <button
+            class="vote-btn"
+            data-post-id="{{ post.id }}"
+            data-action="downvote"
+          >
+            ▼
+          </button>
         </div>
 
         <div class="comment-count">💬 {{ post.comments.count }} Comments</div>
