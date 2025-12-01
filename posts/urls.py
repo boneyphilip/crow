@@ -1,4 +1,4 @@
-
+from django.contrib.auth import views as auth_views
 # Import path function (used to define routes)
 from django.urls import path
 
@@ -19,6 +19,7 @@ urlpatterns = [
     # Django will load the home() view inside views.py
     # This page shows all posts and has the "Create Post" form.
     path('', views.home, name='home'),
+    path("login/", auth_views.LoginView.as_view(template_name="posts/login.html"), name="login"),
 
     # -----------------------------------------------
     #  Create Post Page
