@@ -1,73 +1,67 @@
 /* ==========================================================
-   POST DETAIL PAGE — JS for Reply Form Toggle
+   POST DETAIL — Reply Form Toggle
    ========================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Select all reply buttons
-  const replyButtons = document.querySelectorAll(".reply-toggle");
+  document.body.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("reply-toggle")) return;
 
-  replyButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      // Get the comment ID (from data-id="{{ comment.id }}")
-      const commentId = btn.getAttribute("data-id");
+    const btn = e.target;
+    const id = btn.dataset.id;
 
-      // Find the corresponding reply form
-      const replyForm = document.getElementById(`reply-form-${commentId}`);
+    const form = document.getElementById(`reply-form-${id}`);
+    if (!form) return;
 
-      if (!replyForm) return;
+    const isHidden = form.style.display === "" || form.style.display === "none";
 
-      // Toggle visible / hidden
-      if (
-        replyForm.style.display === "none" ||
-        replyForm.style.display === ""
-      ) {
-        replyForm.style.display = "block";
-        btn.textContent = "Cancel"; // change button text
-      } else {
-        replyForm.style.display = "none";
-        btn.textContent = "Reply"; // revert text
-      }
-    });
+    form.style.display = isHidden ? "block" : "none";
+    btn.textContent = isHidden ? "Cancel" : "Reply";
   });
 });
 
 /* ==========================================================
-   POST DETAIL — AJAX Voting (Upvote + Downvote)
+   POST DETAIL — AJAX Voting
    ========================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("[DETAIL] Voting script loaded");
+  console.log("[DETAIL] Vote JS loaded");
 
-  const voteButtons = document.querySelectorAll(".vote-btn");
+  document.body.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("vote-btn")) return;
 
-  voteButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const postId = btn.getAttribute("data-post-id");
-      const action = btn.getAttribute("data-action");
+    const btn = e.target;
+    const postId = btn.dataset.postId;
+    const action = btn.dataset.action;
 
-      console.log("[DETAIL] Vote clicked:", postId, action);
+    fetch(`/ajax/vote/${postId}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ action }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) return;
 
-      fetch(`/ajax/vote/${postId}/`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": getCookie("csrftoken"),
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action }),
+        const el = document.getElementById("detail-vote-count");
+        if (el) el.textContent = data.upvotes;
       })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("[DETAIL] Server responded:", data);
-
-          if (!data.success) return;
-
-          // Correct ID update
-          const count = document.getElementById(`detail-vote-count-${postId}`);
-          if (count) {
-            count.textContent = data.upvotes;
-          }
-        })
-        .catch((err) => console.error("Vote error:", err));
-    });
+      .catch((err) => console.error("Vote error:", err));
   });
 });
+
+/* ==========================================================
+   CSRF Cookie Helper (REQUIRED)
+   ========================================================== */
+function getCookie(name) {
+  let cookieValue = null;
+  document.cookie.split(";").forEach((cookie) => {
+    cookie = cookie.trim();
+    if (cookie.startsWith(name + "=")) {
+      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+    }
+  });
+  return cookieValue;
+}

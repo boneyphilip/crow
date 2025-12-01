@@ -182,24 +182,29 @@ def post_detail(request, post_id):
 # ==================================================
 
 
+@csrf_exempt
 def ajax_vote(request, post_id):
     if request.method != "POST":
-        return JsonResponse({"error": "Invalid request"}, status=400)
+        return JsonResponse({"success": False, "error": "Invalid method"}, status=405)
+
+    # Load JSON from request
+    data = json.loads(request.body)
+    action = data.get("action")
 
     post = get_object_or_404(Post, id=post_id)
-    action = request.POST.get("action")  # <-- FIXED. Reads form data.
 
+    # Voting logic
     if action == "upvote":
         post.upvotes += 1
-        post.score += 1
     elif action == "downvote":
-        post.score -= 1
+        post.upvotes -= 1
     else:
-        return JsonResponse({"error": "Invalid action"}, status=400)
+        return JsonResponse({"success": False, "error": "Invalid action"}, status=400)
 
     post.save()
 
+    # 🔥 FIX: MUST return success=True
     return JsonResponse({
-        "upvotes": post.upvotes,
-        "score": post.score
+        "success": True,
+        "upvotes": post.upvotes
     })
