@@ -1,4 +1,5 @@
 # posts/views.py
+from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -233,3 +234,21 @@ def edit_post(request, post_id):
         return redirect("post_detail", post_id=post.id)
 
     return render(request, "posts/edit_post.html", {"post": post})
+
+
+# =================================================================================#
+
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Only author can delete
+    if post.author != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this post.")
+
+    if request.method == "POST":
+        post.delete()
+        return redirect("home")
+
+    return render(request, "posts/delete_post.html", {"post": post})
