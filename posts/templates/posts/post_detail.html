@@ -36,6 +36,7 @@
 
       <div class="post-actions">
         <div class="vote-box">
+          {% if user.is_authenticated %}
           <button
             class="vote-btn"
             data-post-id="{{ post.id }}"
@@ -43,11 +44,16 @@
           >
             ▲
           </button>
+          {% else %}
+          <span class="disabled-vote">▲</span>
+          {% endif %}
 
+          <!-- ALWAYS SHOW THE NUMBER -->
           <span class="vote-count" id="detail-vote-count">
             {{ post.upvotes }}
           </span>
 
+          {% if user.is_authenticated %}
           <button
             class="vote-btn"
             data-post-id="{{ post.id }}"
@@ -55,6 +61,9 @@
           >
             ▼
           </button>
+          {% else %}
+          <span class="disabled-vote">▼</span>
+          {% endif %}
         </div>
 
         <div class="comment-count">💬 {{ post.comments.count }} Comments</div>

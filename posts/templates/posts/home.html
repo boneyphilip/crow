@@ -53,7 +53,9 @@
         <!-- ACTION BAR -->
         <div class="post-actions">
           <!-- Upvote box -->
+
           <div class="vote-box">
+            {% if user.is_authenticated %}
             <button
               class="vote-btn"
               data-post-id="{{ post.id }}"
@@ -61,11 +63,16 @@
             >
               ▲
             </button>
+            {% else %}
+            <span class="disabled-vote">▲</span>
+            {% endif %}
 
+            <!-- ALWAYS SHOW THE NUMBER HERE -->
             <span class="vote-count" id="vote-count-{{ post.id }}">
-              {{ post.score }}
+              {{ post.upvotes }}
             </span>
 
+            {% if user.is_authenticated %}
             <button
               class="vote-btn"
               data-post-id="{{ post.id }}"
@@ -73,6 +80,9 @@
             >
               ▼
             </button>
+            {% else %}
+            <span class="disabled-vote">▼</span>
+            {% endif %}
           </div>
 
           <!-- COMMENTS COUNT -->
@@ -86,7 +96,7 @@
 
       {% empty %}
       <p class="no-posts">No posts yet. Be the first to share something!</p>
-      {% endfor %} <
+      {% endfor %}
     </div>
 
     <!-- Home JS -->
