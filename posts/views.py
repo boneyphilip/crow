@@ -1,5 +1,5 @@
 # posts/views.py
-
+from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .models import Comment
@@ -62,6 +62,7 @@ def home(request):
 # ==================================================
 # CREATE POST PAGE (The big UI page)
 # ==================================================
+@login_required
 def create_post(request):
     return render(request, "posts/create_post.html")
 
@@ -119,7 +120,7 @@ def ajax_create_category(request):
 # ADD COMMENT (Top-level comment)
 # ==================================================
 
-
+@login_required
 def add_comment(request, post_id):
     if request.method == "POST":
         post = get_object_or_404(Post, id=post_id)
@@ -145,6 +146,7 @@ def add_comment(request, post_id):
 # ==================================================
 # ADD REPLY (One-level nested reply)
 # ==================================================
+@login_required
 def reply_comment(request, comment_id):
     if request.method == "POST":
         parent_comment = get_object_or_404(Comment, id=comment_id)
@@ -184,6 +186,10 @@ def post_detail(request, post_id):
 
 @csrf_exempt
 def ajax_vote(request, post_id):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"success": False, "error": "Login required"})
+
     if request.method != "POST":
         return JsonResponse({"success": False, "error": "Invalid method"}, status=405)
 
@@ -203,8 +209,27 @@ def ajax_vote(request, post_id):
 
     post.save()
 
-    # 🔥 FIX: MUST return success=True
     return JsonResponse({
         "success": True,
         "upvotes": post.upvotes
     })
+
+
+# = == == == == == == == == == == == == == == == == == == == == == == == == =#
+
+
+@login_required
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Only author can edit
+    if post.author != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this post.")
+
+    if request.method == "POST":
+        post.title = request.POST.get("title")
+        post.content = request.POST.get("content")
+        post.save()
+        return redirect("post_detail", post_id=post.id)
+
+    return render(request, "posts/edit_post.html", {"post": post})
