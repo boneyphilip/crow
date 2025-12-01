@@ -1,0 +1,73 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111;
+  padding: 10px 20px;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-logo .logo-img {
+  height: 40px;
+  width: auto;
+}
+
+.nav-home {
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.nav-right .nav-btn {
+  padding: 6px 12px;
+  background: #444;
+  border-radius: 4px;
+  color: white;
+  text-decoration: none;
+}
+
+.nav-btn:hover {
+  background: #666;
+}
+
+.logout-btn {
+  background: #d33;
+}
+
+.logout-btn:hover {
+  background: #b11;
+}
+
+.nav-search {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-input {
+  width: 60%;
+  max-width: 500px;
+  padding: 7px 12px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+}
+
+.create-btn {
+  background: #5a8dee;
+  font-weight: bold;
+}
+
+.create-btn:hover {
+  background: #3e6fd3;
+}
