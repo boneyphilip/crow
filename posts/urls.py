@@ -1,3 +1,4 @@
+
 from django.contrib.auth import views as auth_views
 # Import path function (used to define routes)
 from django.urls import path
@@ -40,6 +41,8 @@ urlpatterns = [
 
     path("comment/edit/<int:comment_id>/",
          views.edit_comment, name="edit_comment"),
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+
 
 
     # -----------------------------------------------
