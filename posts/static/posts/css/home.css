@@ -94,6 +94,16 @@ body {
   color: #333;
 }
 
+.post-controls {
+  margin-top: 8px;
+}
+
+.post-controls a {
+  margin-right: 10px;
+  font-size: 14px;
+  text-decoration: none;
+}
+
 /* ============================================================
    BOTTOM ACTION BAR
    ============================================================ */

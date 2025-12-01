@@ -49,6 +49,17 @@
 
         <!-- POST CONTENT -->
         <p class="post-content">{{ post.content|truncatechars:250 }}</p>
+        {% if user == post.author %}
+        <div class="post-controls">
+          <a href="{% url 'edit_post' post.id %}" class="edit-btn">Edit</a>
+          <a
+            href="{% url 'delete_post' post.id %}"
+            class="delete-btn"
+            style="color: red"
+            >Delete</a
+          >
+        </div>
+        {% endif %}
 
         <!-- ACTION BAR -->
         <div class="post-actions">
