@@ -1,0 +1,9 @@
+<h1>Edit Comment</h1>
+
+<form method="POST">
+  {% csrf_token %}
+  <textarea name="content">{{ comment.content }}</textarea>
+
+  <button type="submit">Save</button>
+  <a href="{% url 'post_detail' comment.post.id %}">Cancel</a>
+</form>

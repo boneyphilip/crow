@@ -117,6 +117,8 @@
           <a href="{% url 'delete_comment' comment.id %}" style="color: red"
             >Delete</a
           >
+          {% endif %} {% if user == comment.author %}
+          <a href="{% url 'edit_comment' comment.id %}">Edit</a>
           {% endif %}
 
           <!-- Reply Button -->
