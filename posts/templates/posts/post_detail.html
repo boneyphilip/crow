@@ -113,6 +113,11 @@
           </div>
 
           <p class="comment-text">{{ comment.content }}</p>
+          {% if user == comment.author %}
+          <a href="{% url 'delete_comment' comment.id %}" style="color: red"
+            >Delete</a
+          >
+          {% endif %}
 
           <!-- Reply Button -->
           <button class="reply-toggle" data-id="{{ comment.id }}">Reply</button>

@@ -252,3 +252,19 @@ def delete_post(request, post_id):
         return redirect("home")
 
     return render(request, "posts/delete_post.html", {"post": post})
+
+# ==================================================================================#
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    # Only author of comment can delete
+    if comment.author != request.user:
+        return HttpResponseForbidden("You cannot delete this comment.")
+
+    post_id = comment.post.id
+    comment.delete()
+
+    return redirect("post_detail", post_id=post_id)
