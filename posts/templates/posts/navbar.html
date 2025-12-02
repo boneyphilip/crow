@@ -1,33 +1,50 @@
-<div class="sidebar">
-  <div class="sidebar-top">
-    <div class="logo">🐦 Crow</div>
+{% load static %}
 
-    <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
-      <i class="fa-solid fa-house"></i> Home
-    </a>
+<!-- Google Icons -->
+<link
+  href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+  rel="stylesheet"
+/>
 
-    <a href="/explore" class="nav-item">
-      <i class="fa-solid fa-compass"></i> Explore
-    </a>
-
-    <a href="/create/" class="nav-create">
-      <i class="fa-solid fa-circle-plus"></i> Create Post
+<nav class="nav-bar">
+  <!-- LEFT : Logo -->
+  <div class="nav-left">
+    <a href="/" class="logo">
+      <span class="material-icons-outlined logo-icon">auto_awesome</span>
+      <span class="logo-text">CROW</span>
     </a>
   </div>
 
-  <div class="sidebar-bottom">
-    {% if user.is_authenticated %}
-    <a href="/profile" class="nav-item">
-      <i class="fa-solid fa-user"></i> Profile
+  <!-- CENTER : Main Navigation -->
+  <div class="nav-center">
+    <a href="/" class="nav-item">
+      <span class="material-icons-outlined">home</span>
     </a>
 
-    <a href="/logout" class="nav-item logout">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    <a href="#" class="nav-item">
+      <span class="material-icons-outlined">search</span>
     </a>
+
+    <a href="/create/" class="nav-item">
+      <span class="material-icons-outlined">add_circle</span>
+    </a>
+  </div>
+
+  <!-- RIGHT : User Actions -->
+  <div class="nav-right">
+    {% if user.is_authenticated %}
+    <a href="/profile/" class="nav-item">
+      <span class="material-icons-outlined">person</span>
+    </a>
+
+    <a href="/logout/" class="nav-item">
+      <span class="material-icons-outlined">logout</span>
+    </a>
+
     {% else %}
-    <a href="/login" class="nav-item">
-      <i class="fa-solid fa-right-to-bracket"></i> Login
+    <a href="/login/" class="nav-item">
+      <span class="material-icons-outlined">login</span>
     </a>
     {% endif %}
   </div>
-</div>
+</nav>
