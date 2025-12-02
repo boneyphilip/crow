@@ -1,4 +1,5 @@
 # posts/views.py
+from django.db.models import Q
 from urllib import request
 from .models import PostMedia
 from django.contrib.auth.forms import UserCreationForm
@@ -366,3 +367,40 @@ def register_user(request):
         form = UserCreationForm()
 
     return render(request, "posts/register.html", {"form": form})
+
+
+def search_posts(request):
+    return render(request, "posts/search.html")
+
+
+# ==================================================
+
+
+def ajax_search(request):
+    q = request.GET.get("q", "").strip()
+
+    if not q:
+        return JsonResponse({"results": []})
+
+    posts = Post.objects.filter(
+        Q(title__icontains=q) |
+        Q(author__username__icontains=q)
+    ).select_related("author")
+
+    result_list = []
+
+    for p in posts:
+        # first media thumbnail
+        thumb = None
+        if p.media.exists() and p.media.first().is_image:
+            thumb = p.media.first().file.url
+
+        result_list.append({
+            "id": p.id,
+            "title": p.title,
+            "author": p.author.username,
+            "thumb": thumb,
+        })
+
+    return JsonResponse({"results": result_list})
+# ==================================================
