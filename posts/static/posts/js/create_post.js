@@ -89,8 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
         };
         reader.readAsDataURL(file);
       });
-
-      imageInput.value = "";
     });
   }
 
@@ -112,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (vidCount >= 1) {
         alert("Only 1 video allowed.");
-        videoInput.value = "";
+
         return;
       }
 
@@ -141,8 +139,6 @@ document.addEventListener("DOMContentLoaded", function () {
         updateStatus();
         hideIfNoFiles();
       };
-
-      videoInput.value = "";
     });
   }
 
@@ -181,8 +177,6 @@ document.addEventListener("DOMContentLoaded", function () {
           hideIfNoFiles();
         };
       });
-
-      sourceInput.value = "";
     });
   }
 

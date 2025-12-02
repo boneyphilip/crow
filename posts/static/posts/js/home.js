@@ -1,60 +1,43 @@
+/* ==========================================================
+   HOME PAGE — AJAX Voting
+   ========================================================== */
+
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Home.js loaded — voting system ready!");
+  console.log("[HOME] Voting JS loaded");
 
-  // All vote buttons
-  const voteButtons = document.querySelectorAll(".vote-btn");
+  document.body.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("vote-btn")) return;
 
-  voteButtons.forEach((button) => {
-    button.addEventListener("click", function () {
-      const postId = this.getAttribute("data-post-id");
-      const action = this.getAttribute("data-action");
+    const btn = e.target;
+    const postId = btn.dataset.postId;
+    const action = btn.dataset.action;
 
-      console.log("Vote clicked:", postId, action);
+    fetch(`/ajax/vote/${postId}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ action }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) return;
 
-      // POST request to backend
-      fetch(`/ajax/vote/${postId}/`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": getCookie("csrftoken"),
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `action=${action}`,
+        const countEl = document.getElementById(`vote-count-${postId}`);
+        if (countEl) countEl.textContent = data.upvotes;
       })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Server responded:", data);
-
-          if (data.error) {
-            console.error("Vote error:", data.error);
-            return;
-          }
-
-          // Update vote count on UI
-          const voteCountElement = document.getElementById(
-            `vote-count-${postId}`
-          );
-          voteCountElement.textContent = data.score;
-        })
-        .catch((error) => console.error("Fetch error:", error));
-    });
+      .catch((err) => console.error(err));
   });
 });
 
-// CSRF TOKEN HELPER (IMPORTANT)
 function getCookie(name) {
-  let cookieValue = null;
-
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-
-    for (let cookie of cookies) {
-      cookie = cookie.trim();
-
-      if (cookie.startsWith(name + "=")) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
+  let value = null;
+  document.cookie.split(";").forEach((cookie) => {
+    cookie = cookie.trim();
+    if (cookie.startsWith(name + "=")) {
+      value = decodeURIComponent(cookie.slice(name.length + 1));
     }
-  }
-  return cookieValue;
+  });
+  return value;
 }

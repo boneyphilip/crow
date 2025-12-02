@@ -16,17 +16,12 @@
   </head>
 
   <body>
+    {% include 'posts/navbar.html' %}
+    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
+
     <!-- MAIN FEED CONTAINER -->
     <div class="feed-wrapper">
       <h1 class="page-title">Crow 🪶 Community Feed</h1>
-
-      {% if user.is_authenticated %}
-      <span>Hello, {{ user.username }}</span>
-      <a href="{% url 'logout' %}">Logout</a>
-      {% else %}
-      <a href="{% url 'login' %}">Login</a>
-      <a href="{% url 'register' %}">Register</a>
-      {% endif %}
 
       <!-- SUCCESS MESSAGES -->
       {% if messages %} {% for message in messages %}
@@ -57,7 +52,41 @@
 
         <!-- POST CONTENT -->
         <p class="post-content">{{ post.content|truncatechars:250 }}</p>
-        {% if user == post.author %}
+
+        <!-- MEDIA FOR THIS POST -->
+
+        {% if post.media.count == 1 %}
+        <!-- ONE MEDIA → BIG INSTAGRAM PREVIEW -->
+        <div class="media-single">
+          {% with m=post.media.first %} {% if m.is_image %}
+          <img src="{{ m.file.url }}" class="media-single-img" />
+          {% elif m.is_video %}
+          <video controls class="media-single-video">
+            <source src="{{ m.file.url }}" type="video/mp4" />
+          </video>
+          {% else %}
+          <div class="media-single-doc">📄 {{ m.file.name }}</div>
+          {% endif %} {% endwith %}
+        </div>
+
+        {% else %}
+        <!-- MULTIPLE MEDIA → GRID -->
+        <div class="media-grid">
+          {% for media in post.media.all %}
+          <div class="media-item">
+            {% if media.is_image %}
+            <img src="{{ media.file.url }}" />
+            {% elif media.is_video %}
+            <video muted>
+              <source src="{{ media.file.url }}" type="video/mp4" />
+            </video>
+            {% else %}
+            <div class="doc-item">📄</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% if user == post.author %}
         <div class="post-controls">
           <a href="{% url 'edit_post' post.id %}" class="edit-btn">Edit</a>
           <a

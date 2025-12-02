@@ -9,6 +9,9 @@
   </head>
 
   <body>
+    {% include 'posts/navbar.html' %}
+    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
+
     <a href="/" class="back-link">← Back to Home</a>
 
     <!-- MAIN POST CARD -->
@@ -33,6 +36,23 @@
 
       <h1 class="post-title">{{ post.title }}</h1>
       <p class="post-content">{{ post.content }}</p>
+
+      <div class="post-media-section">
+        {% for media in post.media.all %} {% if media.is_image %}
+        <img src="{{ media.file.url }}" class="detail-media" />
+
+        {% elif media.is_video %}
+        <video class="detail-media" controls>
+          <source src="{{ media.file.url }}" type="video/mp4" />
+        </video>
+
+        {% else %}
+        <a href="{{ media.file.url }}" class="detail-file" download>
+          📄 Download Attachment
+        </a>
+
+        {% endif %} {% endfor %}
+      </div>
 
       <!-- SHOW EDIT BUTTON ONLY TO AUTHOR -->
       {% if user == post.author %}

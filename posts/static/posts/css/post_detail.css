@@ -276,3 +276,43 @@ body {
 .reply-text {
   font-size: 15px;
 }
+
+.post-media {
+  margin-top: 15px;
+}
+
+.post-image,
+.post-video {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.post-doc {
+  margin: 8px 0;
+}
+/* Prevent BIG images in post detail from breaking layout */
+.detail-media {
+  max-width: 100%;
+  width: 100%;
+  max-height: 450px;
+  object-fit: contain;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+/* Make sure videos also scale safely */
+video.detail-media {
+  max-width: 100%;
+  width: 100%;
+  max-height: 450px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+/* If you want multi-media grid under the post */
+.post-media-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}

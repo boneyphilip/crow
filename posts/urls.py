@@ -36,11 +36,13 @@ urlpatterns = [
     path("edit/<int:post_id>/", views.edit_post, name="edit_post"),
 
     path("delete/<int:post_id>/", views.delete_post, name="delete_post"),
+
     path("comment/delete/<int:comment_id>/",
          views.delete_comment, name="delete_comment"),
 
     path("comment/edit/<int:comment_id>/",
          views.edit_comment, name="edit_comment"),
+
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
 
 

@@ -10,10 +10,13 @@
   </head>
 
   <body>
+    {% include 'posts/navbar.html' %}
+    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
+
     <div class="container">
       <h1>Create Post</h1>
 
-      <form method="POST">
+      <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- TITLE -->
@@ -29,7 +32,7 @@
           <div class="textarea-wrapper">
             <textarea
               id="summary"
-              name="summary"
+              name="content"
               placeholder="Write a short summary..."
             ></textarea>
             <div class="word-count" id="wordCount">Word count: 0</div>
@@ -51,12 +54,12 @@
             <input
               type="file"
               id="imageInput"
+              name="images"
               multiple
               accept="image/*"
-              hidden
             />
-            <input type="file" id="videoInput" accept="video/*" hidden />
-            <input type="file" id="sourceInput" hidden />
+            <input type="file" id="videoInput" name="video" accept="video/*" />
+            <input type="file" id="sourceInput" name="sources" multiple />
 
             <div id="thumbnailContainer" class="thumbnail-container"></div>
             <div id="combinedPreview"></div>
@@ -71,7 +74,7 @@
 
           <input
             id="categoryInput"
-            name="category_name"
+            name="category"
             type="text"
             placeholder="Start typing a category..."
           />

@@ -1,4 +1,6 @@
 # posts/views.py
+from urllib import request
+from .models import PostMedia
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.http import HttpResponseForbidden
@@ -33,7 +35,7 @@ def home(request):
             post.created_at = timezone.now()
 
             # CATEGORY LOGIC
-            category_name = request.POST.get("category_name", "").strip()
+            category_name = request.POST.get("category", "").strip()
 
             if category_name:
                 category, created = Category.objects.get_or_create(
@@ -75,14 +77,65 @@ def home(request):
 # ==================================================
 # CREATE POST PAGE (The big UI page)
 # ==================================================
+
 @login_required
 def create_post(request):
+
+    if request.method == "POST":
+
+        print("\n===== DEBUG: FILES RECEIVED =====")
+        print("Images:", request.FILES.getlist("images"))
+        print("Video:", request.FILES.get("video"))
+        print("Sources:", request.FILES.getlist("sources"))
+        print("ALL FILE KEYS:", request.FILES.keys())
+        print("=================================\n")
+
+        title = request.POST.get("title", "").strip()
+        content = request.POST.get("content", "").strip()
+        category_name = request.POST.get("category", "").strip()
+
+        # Validate
+        if not title or not content:
+            messages.error(request, "Title and content are required.")
+            return redirect("create_post")
+
+        # CATEGORY
+        if category_name:
+            category, _ = Category.objects.get_or_create(name=category_name)
+        else:
+            category = None
+
+        # Save Post first
+        post = Post.objects.create(
+            title=title,
+            content=content,
+            author=request.user,
+            category=category
+        )
+
+        # 🚀 SAVE IMAGES
+        for img in request.FILES.getlist("images"):
+            PostMedia.objects.create(post=post, file=img)
+
+        # 🚀 SAVE VIDEO (only 1 allowed)
+        if request.FILES.get("video"):
+            PostMedia.objects.create(post=post, file=request.FILES["video"])
+
+        # 🚀 SAVE DOCUMENTS (PDF, DOC, ZIP etc.)
+        for src in request.FILES.getlist("sources"):
+            PostMedia.objects.create(post=post, file=src)
+
+        messages.success(request, "Post created successfully!")
+        return redirect("home")
+
     return render(request, "posts/create_post.html")
 
 
 # ==================================================
 # NORMAL UPVOTE
 # ==================================================
+
+
 def upvote_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     post.upvotes += 1
