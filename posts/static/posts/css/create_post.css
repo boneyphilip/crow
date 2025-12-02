@@ -1,20 +1,31 @@
 /* ============================================================
-   CREATE POST PAGE — CLEAN & STRUCTURED 
-   ============================================================ */
+   0. FULLY HIDE ALL FILE INPUTS (functional but invisible)
+============================================================ */
+#imageInput,
+#videoInput,
+#sourceInput,
+input[type="file"] {
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+}
 
-/* ======================
+/* ============================================================
    1. GLOBAL LAYOUT
-====================== */
+============================================================ */
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: #f5f5f5;
   margin: 0;
-  padding: 60px 0;
+  padding-bottom: 60px;
 }
 
 .container {
   max-width: 760px;
-  margin: auto;
+  margin: 80px auto;
   background: #fff;
   border: 1px solid #e2e2e2;
   border-radius: 10px;
@@ -22,9 +33,9 @@ body {
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.06);
 }
 
-/* ======================
+/* ============================================================
    2. TYPOGRAPHY
-====================== */
+============================================================ */
 h1 {
   font-size: 32px;
   margin-bottom: 30px;
@@ -42,9 +53,9 @@ h1 {
   font-size: 15px;
 }
 
-/* ======================
-   3. INPUTS
-====================== */
+/* ============================================================
+   3. INPUT FIELDS
+============================================================ */
 input[type="text"],
 textarea,
 #categoryInput {
@@ -66,7 +77,6 @@ textarea:focus,
   background: #ffffff;
 }
 
-/* Textarea wrapper (Word count) */
 .textarea-wrapper {
   position: relative;
 }
@@ -85,9 +95,9 @@ textarea {
   color: #777;
 }
 
-/* ======================
+/* ============================================================
    4. ADD-BAR SECTION
-====================== */
+============================================================ */
 .add-bar {
   display: flex;
   gap: 25px;
@@ -109,9 +119,9 @@ textarea {
   font-weight: 700;
 }
 
-/* ======================
-   5. MEDIA PREVIEW BOX
-====================== */
+/* ============================================================
+   5. MEDIA PREVIEW AREA
+============================================================ */
 .preview-area {
   background: #eee;
   border-top: 1px solid #ccc;
@@ -121,7 +131,7 @@ textarea {
   display: none;
 }
 
-/* Image thumbnails */
+/* Thumbnail container */
 .thumbnail-container {
   display: flex;
   gap: 12px;
@@ -155,7 +165,7 @@ textarea {
   border-radius: 3px;
 }
 
-/* Remove image button */
+/* Remove (X) button */
 .remove-btn {
   position: absolute;
   top: 3px;
@@ -174,7 +184,7 @@ textarea {
   background: rgba(255, 0, 0, 0.75);
 }
 
-/* Video / Source rows */
+/* Video / Source file preview rows */
 .row-item {
   display: flex;
   align-items: center;
@@ -226,9 +236,9 @@ textarea {
   color: #555;
 }
 
-/* ======================
+/* ============================================================
    6. CATEGORY DROPDOWN
-====================== */
+============================================================ */
 #categorySuggestions {
   width: 100%;
   position: absolute;
@@ -255,9 +265,9 @@ textarea {
   background: #f0f0f0;
 }
 
-/* ======================
+/* ============================================================
    7. BUTTONS
-====================== */
+============================================================ */
 .button-row {
   margin-top: 30px;
 }
