@@ -1,32 +1,34 @@
 /* ============================================================
-   0. FULLY HIDE ALL FILE INPUTS (functional but invisible)
+   0. FIX NAVBAR SPACING (keeps content below navbar)
+============================================================ */
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: #f5f5f5;
+  margin: 0 !important;
+  padding-top: 72px !important;
+  padding-bottom: 60px;
+}
+/* Hide navbar search box only on Create Post page */
+.navbar .nav-center {
+  display: none !important;
+}
+
+/* ============================================================
+   1. HIDE ALL BROWSER DEFAULT FILE INPUTS
 ============================================================ */
 #imageInput,
 #videoInput,
 #sourceInput,
 input[type="file"] {
-  position: absolute !important;
-  width: 0 !important;
-  height: 0 !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
   display: none !important;
 }
 
 /* ============================================================
-   1. GLOBAL LAYOUT
+   2. MAIN CONTAINER
 ============================================================ */
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background: #f5f5f5;
-  margin: 0;
-  padding-bottom: 60px;
-  padding-top: 74px !important;
-}
-
 .container {
   max-width: 760px;
-  margin: 80px auto;
+  margin: 40px auto;
   background: #fff;
   border: 1px solid #e2e2e2;
   border-radius: 10px;
@@ -35,12 +37,12 @@ body {
 }
 
 /* ============================================================
-   2. TYPOGRAPHY
+   3. TITLES & LABELS
 ============================================================ */
 h1 {
-  font-size: 32px;
-  margin-bottom: 30px;
-  font-weight: 400;
+  font-size: 28px;
+  margin-bottom: 28px;
+  font-weight: 500;
 }
 
 .form-group {
@@ -55,7 +57,7 @@ h1 {
 }
 
 /* ============================================================
-   3. INPUT FIELDS
+   4. INPUT FIELDS
 ============================================================ */
 input[type="text"],
 textarea,
@@ -66,7 +68,7 @@ textarea,
   border: 1px solid #cfcfcf;
   border-radius: 6px;
   background: #fcfcfc;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: 0.2s ease;
   box-sizing: border-box;
 }
 
@@ -74,10 +76,11 @@ input[type="text"]:focus,
 textarea:focus,
 #categoryInput:focus {
   border: 2px solid #000;
+  background: #fff;
   outline: none;
-  background: #ffffff;
 }
 
+/* Word count wrapper */
 .textarea-wrapper {
   position: relative;
 }
@@ -97,7 +100,7 @@ textarea {
 }
 
 /* ============================================================
-   4. ADD-BAR SECTION
+   5. ADD MEDIA BAR
 ============================================================ */
 .add-bar {
   display: flex;
@@ -121,7 +124,7 @@ textarea {
 }
 
 /* ============================================================
-   5. MEDIA PREVIEW AREA
+   6. MEDIA PREVIEW AREA
 ============================================================ */
 .preview-area {
   background: #eee;
@@ -132,7 +135,7 @@ textarea {
   display: none;
 }
 
-/* Thumbnail container */
+/* Thumbnails */
 .thumbnail-container {
   display: flex;
   gap: 12px;
@@ -166,7 +169,7 @@ textarea {
   border-radius: 3px;
 }
 
-/* Remove (X) button */
+/* Remove image button */
 .remove-btn {
   position: absolute;
   top: 3px;
@@ -182,10 +185,10 @@ textarea {
 }
 
 .remove-btn:hover {
-  background: rgba(255, 0, 0, 0.75);
+  background: rgba(255, 0, 0, 0.8);
 }
 
-/* Video / Source file preview rows */
+/* Document & video rows */
 .row-item {
   display: flex;
   align-items: center;
@@ -211,16 +214,17 @@ textarea {
   text-overflow: ellipsis;
 }
 
+/* Remove row button */
 .remove-row-btn {
   position: absolute;
   top: 50%;
   right: 6px;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.85);
   width: 18px;
   height: 18px;
   border-radius: 50%;
   border: none;
+  background: rgba(0, 0, 0, 0.85);
   color: white;
   cursor: pointer;
   font-size: 12px;
@@ -238,7 +242,7 @@ textarea {
 }
 
 /* ============================================================
-   6. CATEGORY DROPDOWN
+   7. CATEGORY SUGGESTIONS
 ============================================================ */
 #categorySuggestions {
   width: 100%;
@@ -267,7 +271,7 @@ textarea {
 }
 
 /* ============================================================
-   7. BUTTONS
+   8. BUTTONS
 ============================================================ */
 .button-row {
   margin-top: 30px;
@@ -281,7 +285,7 @@ textarea {
   border: 1px solid #bfbfbf;
   background: #eee;
   cursor: pointer;
-  transition: background 0.25s, color 0.25s, transform 0.2s;
+  transition: 0.25s ease;
 }
 
 .btn-secondary {
@@ -293,4 +297,18 @@ textarea {
   background: #000;
   color: #fff;
   transform: translateY(-2px);
+}
+
+/* ============================================================
+   9. RESPONSIVE FIXES
+============================================================ */
+@media (max-width: 540px) {
+  .container {
+    padding: 30px 20px;
+  }
+
+  .add-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

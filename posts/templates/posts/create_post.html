@@ -5,13 +5,13 @@
     <meta charset="UTF-8" />
     <title>Create Post</title>
 
-    <!-- External CSS -->
+    <!-- LOAD ONLY create_post.css -->
     <link rel="stylesheet" href="{% static 'posts/css/create_post.css' %}" />
   </head>
 
   <body>
     {% include 'posts/navbar.html' %}
-    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
+    <!-- DO NOT load navbar.css here -->
 
     <div class="container">
       <h1>Create Post</h1>
@@ -28,7 +28,6 @@
         <!-- SUMMARY -->
         <div class="form-group">
           <label>Summary</label>
-
           <div class="textarea-wrapper">
             <textarea
               id="summary"
@@ -38,7 +37,6 @@
             <div class="word-count" id="wordCount">Word count: 0</div>
           </div>
 
-          <!-- ADD BAR -->
           <div class="add-bar">
             <span id="addImageBtn"
               ><span class="plus">+</span> Add Pictures</span
@@ -49,7 +47,6 @@
             >
           </div>
 
-          <!-- PREVIEW AREA -->
           <div id="previewArea" class="preview-area">
             <input
               type="file"
@@ -63,7 +60,6 @@
 
             <div id="thumbnailContainer" class="thumbnail-container"></div>
             <div id="combinedPreview"></div>
-
             <div id="previewStatusBar" class="preview-status"></div>
           </div>
         </div>
@@ -71,7 +67,6 @@
         <!-- CATEGORY -->
         <div class="form-group" style="position: relative">
           <label>Category</label>
-
           <input
             id="categoryInput"
             name="category"
@@ -81,7 +76,6 @@
           <div id="categorySuggestions"></div>
         </div>
 
-        <!-- BUTTONS -->
         <div class="button-row">
           <button type="submit" class="btn-primary">Submit</button>
           <button
@@ -95,7 +89,6 @@
       </form>
     </div>
 
-    <!-- External JS -->
     <script src="{% static 'posts/js/create_post.js' %}"></script>
   </body>
 </html>

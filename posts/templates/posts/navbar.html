@@ -1,12 +1,12 @@
 {% load static %}
-
 <link
   href="https://fonts.googleapis.com/icon?family=Material+Icons+Round"
   rel="stylesheet"
 />
+<link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
 
 <nav class="navbar">
-  <!-- LEFT: Logo -->
+  <!-- LEFT — Logo -->
   <div class="nav-left">
     <a href="/" class="nav-logo">
       <span class="material-icons-round logo-icon">filter_drama</span>
@@ -14,16 +14,28 @@
     </a>
   </div>
 
-  <!-- CENTER: Icons -->
+  <!-- CENTER — Search -->
   <div class="nav-center">
+    <div class="search-box">
+      <span class="material-icons-round search-icon">search</span>
+      <input
+        type="text"
+        id="searchBar"
+        placeholder="Search posts or users..."
+        autocomplete="off"
+      />
+      <div id="searchResults" class="search-results"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT — Action Icons -->
+  <div class="nav-right">
+    <!-- Home -->
     <a href="/" class="nav-icon">
       <span class="material-icons-round">home</span>
     </a>
 
-    <a id="searchIcon" class="nav-icon">
-      <span class="material-icons-round">search</span>
-    </a>
-
+    <!-- Create -->
     {% if user.is_authenticated %}
     <a href="/create/" class="nav-icon">
       <span class="material-icons-round">add_box</span>
@@ -33,38 +45,26 @@
       <span class="material-icons-round">add_box</span>
     </a>
     {% endif %}
-  </div>
 
-  <!-- RIGHT: Auth -->
-  <div class="nav-right">
-    {% if user.is_authenticated %}
-    <a href="/logout/" class="nav-auth-btn">Logout</a>
-    {% else %}
-    <a href="/login/" class="nav-auth-btn">Sign In</a>
-    {% endif %}
-  </div>
+    <!-- Profile Avatar + Dropdown -->
+    <div class="profile-wrapper">
+      <button class="nav-profile-btn">
+        <img
+          class="nav-avatar"
+          src="https://ui-avatars.com/api/?name={{ user.username|default:'Guest' }}&background=111111&color=ffffff&size=64"
+        />
+      </button>
 
-  <!-- SEARCH DROPDOWN -->
-  <
-  <div class="search-wrapper">
-    <i class="material-icons">search</i>
-    <input type="text" id="searchBar" placeholder="Search posts or users..." />
-    <div id="searchResults" class="search-results"></div>
+      <div class="profile-menu">
+        {% if user.is_authenticated %}
+        <a href="/logout/" class="pm-item logout">Logout</a>
+        {% else %}
+        <a href="/login/" class="pm-item">Sign In</a>
+        <a href="/register/" class="pm-item">Create Account</a>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </nav>
 
-<!-- SEARCH JS -->
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const searchIcon = document.getElementById("searchIcon");
-    const searchBox = document.getElementById("searchBox");
-
-    searchIcon.addEventListener("click", () => {
-      if (searchBox.classList.contains("open")) {
-        searchBox.classList.remove("open");
-      } else {
-        searchBox.classList.add("open");
-      }
-    });
-  });
-</script>
+<script src="{% static 'posts/js/navbar.js' %}"></script>

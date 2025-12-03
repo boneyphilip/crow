@@ -1,7 +1,12 @@
-/* ============================================================
-   GLOBAL
-============================================================ */
+html,
 body {
+  overflow-x: hidden;
+}
+/*=========================================================
+  GLOBAL
+======================================================*/
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: #f3f4f6;
   font-family: "Inter", sans-serif;
   margin: 0;

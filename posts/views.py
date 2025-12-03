@@ -1,74 +1,61 @@
 # posts/views.py
 from django.db.models import Q
-from urllib import request
-from .models import PostMedia
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
-import json
-from django.views.decorators.csrf import csrf_exempt
-from .models import Comment
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
 from django.contrib.auth.models import User
-from django.utils import timezone
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
 
-from .models import Post, Category
+from django.http import JsonResponse, HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
+
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+
+import json
+
+from .models import Post, PostMedia, Comment, Category
 from .forms import PostForm
 
 
 # ==================================================
-# HOME PAGE — shows posts + SEARCH + form POST
+# HOME PAGE — Shows posts & Handles search
 # ==================================================
 def home(request):
 
-    # If someone submits the post form
+    # ----- POST Submission inside Home (optional form) -----
     if request.method == "POST":
         form = PostForm(request.POST)
 
         if form.is_valid():
             post = form.save(commit=False)
-
-            # Author of the post
             post.author = request.user if request.user.is_authenticated else User.objects.first()
             post.created_at = timezone.now()
 
-            # CATEGORY LOGIC
+            # Category
             category_name = request.POST.get("category", "").strip()
-
             if category_name:
                 category, created = Category.objects.get_or_create(
                     name=category_name)
-
-                if created:
-                    messages.success(
-                        request, f"New category '{category_name}' created!")
-
                 post.category = category
-
             post.save()
 
             messages.success(
                 request, "Your post has been shared successfully!")
             return redirect("home")
-
     else:
         form = PostForm()
 
-    # ==============================
-    # 🔍 SEARCH LOGIC
-    # ==============================
-    query = request.GET.get("q")
+    # ----- SEARCH LOGIC -----
+    query = request.GET.get("q", "")
 
     if query:
         posts = Post.objects.filter(
-            title__icontains=query).order_by("-created_at")
+            title__icontains=query
+        ).order_by("-created_at")
     else:
         posts = Post.objects.all().order_by("-created_at")
 
-    # Render home page
     return render(request, "posts/home.html", {
         "form": form,
         "posts": posts
@@ -76,9 +63,8 @@ def home(request):
 
 
 # ==================================================
-# CREATE POST PAGE (The big UI page)
+# CREATE POST PAGE — Dedicated upload page
 # ==================================================
-
 @login_required
 def create_post(request):
 
@@ -95,18 +81,16 @@ def create_post(request):
         content = request.POST.get("content", "").strip()
         category_name = request.POST.get("category", "").strip()
 
-        # Validate
         if not title or not content:
             messages.error(request, "Title and content are required.")
             return redirect("create_post")
 
-        # CATEGORY
+        # Create category if needed
+        category = None
         if category_name:
             category, _ = Category.objects.get_or_create(name=category_name)
-        else:
-            category = None
 
-        # Save Post first
+        # Create Post
         post = Post.objects.create(
             title=title,
             content=content,
@@ -114,15 +98,15 @@ def create_post(request):
             category=category
         )
 
-        # 🚀 SAVE IMAGES
+        # Save Images
         for img in request.FILES.getlist("images"):
             PostMedia.objects.create(post=post, file=img)
 
-        # 🚀 SAVE VIDEO (only 1 allowed)
+        # Save Video
         if request.FILES.get("video"):
             PostMedia.objects.create(post=post, file=request.FILES["video"])
 
-        # 🚀 SAVE DOCUMENTS (PDF, DOC, ZIP etc.)
+        # Save Docs
         for src in request.FILES.getlist("sources"):
             PostMedia.objects.create(post=post, file=src)
 
@@ -133,10 +117,8 @@ def create_post(request):
 
 
 # ==================================================
-# NORMAL UPVOTE
+# NORMAL (NON-AJAX) UPVOTE
 # ==================================================
-
-
 def upvote_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     post.upvotes += 1
@@ -184,9 +166,8 @@ def ajax_create_category(request):
 
 
 # ==================================================
-# ADD COMMENT (Top-level comment)
+# ADD COMMENT
 # ==================================================
-
 @login_required
 def add_comment(request, post_id):
     if request.method == "POST":
@@ -199,19 +180,18 @@ def add_comment(request, post_id):
 
         Comment.objects.create(
             post=post,
-            author=request.user if request.user.is_authenticated else User.objects.first(),
+            author=request.user,
             content=content,
             parent=None
         )
 
-        messages.success(request, "Comment added!")
         return redirect("home")
 
     return redirect("home")
 
 
 # ==================================================
-# ADD REPLY (One-level nested reply)
+# REPLY TO COMMENT
 # ==================================================
 @login_required
 def reply_comment(request, comment_id):
@@ -226,31 +206,27 @@ def reply_comment(request, comment_id):
 
         Comment.objects.create(
             post=post,
-            author=request.user if request.user.is_authenticated else User.objects.first(),
+            author=request.user,
             content=content,
             parent=parent_comment
         )
 
-        messages.success(request, "Reply added!")
         return redirect("post_detail", post_id=post.id)
 
     return redirect("home")
 
 
 # ==================================================
-# POST DETAIL PAGE (Single Post Page)
+# POST DETAIL PAGE
 # ==================================================
-
-
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     return render(request, "posts/post_detail.html", {"post": post})
 
-# ==================================================
-# AJAX VOTING (Upvote & Downvote)
-# ==================================================
 
-
+# ==================================================
+# AJAX VOTING
+# ==================================================
 @csrf_exempt
 def ajax_vote(request, post_id):
 
@@ -260,13 +236,11 @@ def ajax_vote(request, post_id):
     if request.method != "POST":
         return JsonResponse({"success": False, "error": "Invalid method"}, status=405)
 
-    # Load JSON from request
     data = json.loads(request.body)
     action = data.get("action")
 
     post = get_object_or_404(Post, id=post_id)
 
-    # Voting logic
     if action == "upvote":
         post.upvotes += 1
     elif action == "downvote":
@@ -276,20 +250,16 @@ def ajax_vote(request, post_id):
 
     post.save()
 
-    return JsonResponse({
-        "success": True,
-        "upvotes": post.upvotes
-    })
+    return JsonResponse({"success": True, "upvotes": post.upvotes})
 
 
-# = == == == == == == == == == == == == == == == == == == == == == == == == =#
-
-
+# ==================================================
+# EDIT POST
+# ==================================================
 @login_required
 def edit_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
-    # Only author can edit
     if post.author != request.user:
         return HttpResponseForbidden("You are not allowed to edit this post.")
 
@@ -302,16 +272,17 @@ def edit_post(request, post_id):
     return render(request, "posts/edit_post.html", {"post": post})
 
 
-# =================================================================================#
-
-
+# ==================================================
+# DELETE POST
+# ==================================================
 @login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
-    # Only author can delete
     if post.author != request.user:
-        return HttpResponseForbidden("You are not allowed to delete this post.")
+        return HttpResponseForbidden(
+            "You are not allowed to delete this post."
+        )
 
     if request.method == "POST":
         post.delete()
@@ -319,14 +290,14 @@ def delete_post(request, post_id):
 
     return render(request, "posts/delete_post.html", {"post": post})
 
-# ==================================================================================#
 
-
+# ==================================================
+# DELETE COMMENT
+# ==================================================
 @login_required
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
 
-    # Only author of comment can delete
     if comment.author != request.user:
         return HttpResponseForbidden("You cannot delete this comment.")
 
@@ -335,14 +306,14 @@ def delete_comment(request, comment_id):
 
     return redirect("post_detail", post_id=post_id)
 
-# ==================================================================================#
 
-
+# ==================================================
+# EDIT COMMENT
+# ==================================================
 @login_required
 def edit_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
 
-    # Author check
     if comment.author != request.user:
         return HttpResponseForbidden("You cannot edit this comment.")
 
@@ -353,29 +324,28 @@ def edit_comment(request, comment_id):
 
     return render(request, "posts/edit_comment.html", {"comment": comment})
 
-# ===============================================================================#
 
-
+# ==================================================
+# REGISTER USER
+# ==================================================
 def register_user(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
+
         if form.is_valid():
             user = form.save()
-            login(request, user)  # auto-login after signup
+            login(request, user)
             return redirect("home")
+
     else:
         form = UserCreationForm()
 
     return render(request, "posts/register.html", {"form": form})
 
 
-def search_posts(request):
-    return render(request, "posts/search.html")
-
-
 # ==================================================
-
-
+# AJAX SEARCH FOR NAV SEARCHBAR
+# ==================================================
 def ajax_search(request):
     q = request.GET.get("q", "").strip()
 
@@ -390,7 +360,6 @@ def ajax_search(request):
     result_list = []
 
     for p in posts:
-        # first media thumbnail
         thumb = None
         if p.media.exists() and p.media.first().is_image:
             thumb = p.media.first().file.url
@@ -403,4 +372,3 @@ def ajax_search(request):
         })
 
     return JsonResponse({"results": result_list})
-# ==================================================
