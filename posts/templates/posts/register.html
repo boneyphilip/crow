@@ -1,23 +1,46 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Register</title>
+    <meta charset="UTF-8" />
+    <title>Create Account • Crow</title>
+
+    <link rel="stylesheet" href="{% static 'posts/css/auth.css' %}" />
   </head>
+
   <body>
     {% include 'posts/navbar.html' %}
-    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
 
-    <h1>Create an Account</h1>
+    <div class="auth-container">
+      <div class="auth-card">
+        <h2>Create Account</h2>
 
-    <form method="POST">
-      {% csrf_token %} {{ form.as_p }}
+        <form method="POST">
+          {% csrf_token %}
 
-      <button type="submit">Register</button>
-    </form>
+          <div class="auth-group">
+            <label>Username</label>
+            <input type="text" name="username" required />
+          </div>
 
-    <p>
-      Already have an account?
-      <a href="{% url 'login' %}">Login here</a>
-    </p>
+          <div class="auth-group">
+            <label>Password</label>
+            <input type="password" name="password1" required />
+          </div>
+
+          <div class="auth-group">
+            <label>Confirm Password</label>
+            <input type="password" name="password2" required />
+          </div>
+
+          <button class="auth-btn" type="submit">Create Account</button>
+        </form>
+
+        <p class="auth-footer">
+          Already have an account?
+          <a href="/login/">Sign In</a>
+        </p>
+      </div>
+    </div>
   </body>
 </html>
