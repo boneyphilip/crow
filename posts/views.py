@@ -372,3 +372,19 @@ def ajax_search(request):
         })
 
     return JsonResponse({"results": result_list})
+
+
+# =================================================
+profile_page
+# ==================================================
+
+
+def profile_page(request, username):
+    user_obj = get_object_or_404(User, username=username)
+
+    posts = Post.objects.filter(author=user_obj).order_by("-created_at")
+
+    return render(request, "posts/profile.html", {
+        "profile_user": user_obj,
+        "posts": posts
+    })

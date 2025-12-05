@@ -11,6 +11,7 @@ urlpatterns = [
     path("login/", auth_views.LoginView.as_view(template_name="posts/login.html"), name="login"),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("register/", views.register_user, name="register"),
+    path("profile/<str:username>/", views.profile_page, name="profile_page"),
 
     # ---------- SEARCH ----------
     path("search/ajax/", views.ajax_search, name="ajax_search"),
