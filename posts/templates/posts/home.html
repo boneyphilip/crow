@@ -3,12 +3,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Crow — Community Feed</title>
+    <title>Crow — Home Feed</title>
 
-    <!-- Home Page CSS -->
+    <!-- Styles -->
+    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
     <link rel="stylesheet" href="{% static 'posts/css/home.css' %}" />
 
-    <!-- Optional clean font -->
+    <!-- Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       rel="stylesheet"
@@ -16,27 +17,30 @@
   </head>
 
   <body>
+    <!-- NAVBAR -->
     {% include 'posts/navbar.html' %}
-    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
 
-    <!-- MAIN FEED CONTAINER -->
+    <!-- MAIN FEED WRAPPER -->
     <div class="feed-wrapper">
-      <!-- SUCCESS MESSAGES -->
+      <!-- FLASH MESSAGES -->
       {% if messages %} {% for message in messages %}
       <div class="flash-message">{{ message }}</div>
-      {% endfor %} {% endif %} {% for post in posts %}
+      {% endfor %} {% endif %}
+
+      <!-- POSTS LOOP -->
+      {% for post in posts %}
       <div class="post-card">
-        <!-- POST HEADER -->
+        <!-- HEADER -->
         <div class="post-header">
           <img
-            src="https://ui-avatars.com/api/?name={{ post.author.username }}"
             class="post-avatar"
+            src="https://ui-avatars.com/api/?name={{ post.author.username }}"
           />
 
           <div class="post-meta">
             <span class="post-author">{{ post.author.username }}</span>
-            <span class="post-time"
-              >• {{ post.created_at|naturaltime|clean_time }}</span
+            <span class="post-time">
+              • {{ post.created_at|naturaltime|clean_time }}</span
             >
 
             {% if post.category %}
@@ -45,18 +49,16 @@
           </div>
         </div>
 
-        <!-- POST TITLE -->
+        <!-- TITLE -->
         <h2 class="post-title">{{ post.title }}</h2>
 
-        <!-- POST CONTENT -->
+        <!-- CONTENT SUMMARY -->
         <p class="post-content">{{ post.content|truncatechars:250 }}</p>
 
-        <!-- MEDIA FOR THIS POST -->
-
-        {% if post.media.count == 1 %}
-        <!-- ONE MEDIA → BIG INSTAGRAM PREVIEW -->
+        <!-- MEDIA HANDLING -->
+        {% if post.media.count == 1 %} {% with m=post.media.first %}
         <div class="media-single">
-          {% with m=post.media.first %} {% if m.is_image %}
+          {% if m.is_image %}
           <img src="{{ m.file.url }}" class="media-single-img" />
           {% elif m.is_video %}
           <video controls class="media-single-video">
@@ -64,11 +66,9 @@
           </video>
           {% else %}
           <div class="media-single-doc">📄 {{ m.file.name }}</div>
-          {% endif %} {% endwith %}
+          {% endif %}
         </div>
-
-        {% else %}
-        <!-- MULTIPLE MEDIA → GRID -->
+        {% endwith %} {% elif post.media.count > 1 %}
         <div class="media-grid">
           {% for media in post.media.all %}
           <div class="media-item">
@@ -84,13 +84,13 @@
           </div>
           {% endfor %}
         </div>
-        {% endif %} {% if user == post.author %}
+        {% endif %}
+
+        <!-- OWNER CONTROLS -->
+        {% if user == post.author %}
         <div class="post-controls">
           <a href="{% url 'edit_post' post.id %}" class="edit-btn">Edit</a>
-          <a
-            href="{% url 'delete_post' post.id %}"
-            class="delete-btn"
-            style="color: red"
+          <a href="{% url 'delete_post' post.id %}" class="delete-btn"
             >Delete</a
           >
         </div>
@@ -98,8 +98,7 @@
 
         <!-- ACTION BAR -->
         <div class="post-actions">
-          <!-- Upvote box -->
-
+          <!-- Votes -->
           <div class="vote-box">
             {% if user.is_authenticated %}
             <button
@@ -113,10 +112,9 @@
             <span class="disabled-vote">▲</span>
             {% endif %}
 
-            <!-- ALWAYS SHOW THE NUMBER HERE -->
-            <span class="vote-count" id="vote-count-{{ post.id }}">
-              {{ post.upvotes }}
-            </span>
+            <span class="vote-count" id="vote-count-{{ post.id }}"
+              >{{ post.upvotes }}</span
+            >
 
             {% if user.is_authenticated %}
             <button
@@ -131,21 +129,21 @@
             {% endif %}
           </div>
 
-          <!-- COMMENTS COUNT -->
+          <!-- Comment link -->
           <a href="{% url 'post_detail' post.id %}" class="action-btn">
             💬 {{ post.comments.count }} Comments
           </a>
 
-          <div class="action-btn">↗ Share</div>
+          <!-- Share -->
+          <div class="action-btn share-btn">↗ Share</div>
         </div>
       </div>
-
       {% empty %}
       <p class="no-posts">No posts yet. Be the first to share something!</p>
       {% endfor %}
     </div>
 
-    <!-- Home JS -->
+    <!-- Scripts -->
     <script src="{% static 'posts/js/home.js' %}"></script>
   </body>
 </html>
