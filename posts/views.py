@@ -375,16 +375,15 @@ def ajax_search(request):
 
 
 # =================================================
-profile_page
+    profile_page
 # ==================================================
 
 
 def profile_page(request, username):
-    user_obj = get_object_or_404(User, username=username)
-
-    posts = Post.objects.filter(author=user_obj).order_by("-created_at")
+    profile_user = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=profile_user).order_by("-created_at")
 
     return render(request, "posts/profile.html", {
-        "profile_user": user_obj,
+        "profile_user": profile_user,
         "posts": posts
     })

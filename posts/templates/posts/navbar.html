@@ -28,14 +28,14 @@
     </div>
   </div>
 
-  <!-- RIGHT — Action Icons -->
+  <!-- RIGHT — Icons -->
   <div class="nav-right">
-    <!-- Home -->
+    <!-- HOME ICON -->
     <a href="/" class="nav-icon">
       <span class="material-icons-round">home</span>
     </a>
 
-    <!-- Create -->
+    <!-- CREATE POST ICON -->
     {% if user.is_authenticated %}
     <a href="/create/" class="nav-icon">
       <span class="material-icons-round">add_box</span>
@@ -46,7 +46,7 @@
     </a>
     {% endif %}
 
-    <!-- Profile Avatar + Dropdown -->
+    <!-- PROFILE AVATAR + DROPDOWN -->
     <div class="profile-wrapper">
       <button class="nav-profile-btn">
         <img
@@ -57,6 +57,7 @@
 
       <div class="profile-menu">
         {% if user.is_authenticated %}
+        <a href="/profile/{{ user.username }}/" class="pm-item">Profile</a>
         <a href="/logout/" class="pm-item logout">Logout</a>
         {% else %}
         <a href="/login/" class="pm-item">Sign In</a>

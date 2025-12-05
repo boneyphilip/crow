@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ profile_user.username }} — Profile</title>
+    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
+    <link rel="stylesheet" href="{% static 'posts/css/profile.css' %}" />
+  </head>
+  <body>
+    {% include 'posts/navbar.html' %}
+
+    <div class="profile-container">
+      <!-- HEADER -->
+      <div class="profile-header">
+        <img
+          class="profile-avatar"
+          src="https://ui-avatars.com/api/?name={{ profile_user.username }}&size=256&background=111111&color=ffffff"
+        />
+
+        <div class="profile-info">
+          <h2>{{ profile_user.username }}</h2>
+          <p class="joined">
+            Joined: {{ profile_user.date_joined|date:"M d, Y" }}
+          </p>
+
+          <div class="stats">
+            <span><strong>{{ posts.count }}</strong> posts</span>
+            <span
+              ><strong>{{ profile_user.comment_set.count }}</strong>
+              comments</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- POSTS GRID -->
+      <h3 class="section-title">Posts</h3>
+
+      <div class="profile-post-grid">
+        {% for post in posts %}
+        <a href="{% url 'post_detail' post.id %}" class="profile-post-item">
+          {% if post.media.first and post.media.first.is_image %}
+          <img src="{{ post.media.first.file.url }}" />
+          {% elif post.media.first and post.media.first.is_video %}
+          <video muted>
+            <source src="{{ post.media.first.file.url }}" type="video/mp4" />
+          </video>
+          {% else %}
+          <div class="doc-icon">📄</div>
+          {% endif %}
+        </a>
+        {% empty %}
+        <p>No posts yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>
