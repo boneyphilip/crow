@@ -1,199 +1,204 @@
-html,
-body {
-  overflow-x: hidden;
-}
-/*=========================================================
-  GLOBAL
-======================================================*/
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background: #f3f4f6;
-  font-family: "Inter", sans-serif;
-  margin: 0;
-  padding: 50px 16px 16px 16px;
-}
-
 /* ============================================================
-   FEED LAYOUT (CENTER + RESPONSIVE)
+   GLOBAL LAYOUT
 ============================================================ */
-.feed-wrapper {
-  width: 780px;
-  margin: 40px auto;
-  padding: 0 16px; /* Small padding for mobile */
+body {
+  background: #f5f5f5;
+  margin: 0;
+  padding-top: 72px; /* navbar space */
+  font-family: "Inter", sans-serif;
 }
 
-/* Center title */
-.page-title {
-  text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 35px;
+.feed-wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Flash messages */
+.flash-message {
+  background: #e8f5e9;
+  border-left: 4px solid #43a047;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
 }
 
 /* ============================================================
-   POST CARD (CENTERED & RESPONSIVE)
+   POST CARD
 ============================================================ */
 .post-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 26px;
-  margin: 0 auto 30px auto; /* <-- CENTER CARDS */
-  width: 100%;
-  max-width: 760px; /* <-- No extra shrinking */
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  border: 1px solid #e2e2e2;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.04);
 }
 
-/* Header */
+/* ============================================================
+   POST HEADER
+============================================================ */
 .post-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 12px;
 }
 
 .post-avatar {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .post-meta {
   display: flex;
   flex-direction: column;
-  font-size: 14px;
-  color: #555;
 }
 
-.post-category {
-  margin-top: 4px;
-  background: #f1f5f9;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+.post-author {
   font-weight: 600;
+  font-size: 15px;
+}
+
+.post-time {
+  color: #666;
+  font-size: 12px;
+}
+
+/* Category Badge */
+.post-category {
+  background: #eaf3ff;
+  color: #1a73e8;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 100px;
+  margin-top: 2px;
+  width: fit-content;
 }
 
 /* ============================================================
-   SINGLE MEDIA (ONE IMAGE/VIDEO)
+   TITLE & CONTENT
 ============================================================ */
-.media-single {
-  width: 100%;
-  height: 480px;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000;
+.post-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 15px 0 8px 0;
+}
+
+.post-content {
+  font-size: 14px;
+  color: #333;
   margin-bottom: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+}
+
+/* ============================================================
+   MEDIA DISPLAY
+============================================================ */
+
+/* 1 Image — big Instagram-style */
+.media-single {
+  margin-top: 12px;
 }
 
 .media-single-img,
 .media-single-video {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  border-radius: 10px;
+  background: #000;
 }
 
-/* ============================================================
-   MULTIPLE MEDIA GRID (INSTAGRAM STYLE)
-============================================================ */
+/* Multiple image grid */
 .media-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
   margin-top: 12px;
-}
-
-.media-item {
-  width: 100%;
-  height: 170px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #eee;
 }
 
 .media-item img,
 .media-item video {
   width: 100%;
-  height: 100%;
+  height: 170px;
   object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Doc preview */
+.media-single-doc {
+  padding: 16px;
+  background: #eee;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 /* ============================================================
-   ACTION BAR
+   POST CONTROLS (Edit/Delete)
+============================================================ */
+.post-controls {
+  margin-top: 12px;
+  display: flex;
+  gap: 14px;
+}
+
+.edit-btn,
+.delete-btn {
+  font-size: 14px;
+  text-decoration: none;
+}
+
+/* ============================================================
+   ACTION BAR (votes + comments)
 ============================================================ */
 .post-actions {
   display: flex;
   align-items: center;
-  gap: 26px;
-  padding-top: 18px;
-  border-top: 1px solid #eee;
+  justify-content: space-between;
+  margin-top: 16px;
 }
 
-/* Voting */
 .vote-box {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #f3f4f6;
-  padding: 8px 16px;
-  border-radius: 12px;
+  gap: 8px;
+}
+
+.vote-btn {
+  background: #eee;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.vote-btn:hover {
+  background: #ccc;
+}
+
+.vote-count {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.action-btn {
+  font-size: 14px;
+  cursor: pointer;
+  color: #333;
+}
+
+.action-btn:hover {
+  text-decoration: underline;
 }
 
 /* ============================================================
-   RESPONSIVE BREAKPOINTS
+   RESPONSIVE FIXES
 ============================================================ */
-
-/* Tablet */
-@media (max-width: 900px) {
-  .feed-wrapper {
-    width: 100%;
-  }
-  .post-card {
-    max-width: 95%;
-  }
-
-  .media-single {
-    height: 380px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .feed-wrapper {
-    margin-top: 20px;
-    width: 100%;
-  }
-
-  .post-card {
-    padding: 16px;
-    border-radius: 12px;
-    max-width: 100%;
-  }
-
-  .media-single {
-    height: 260px;
-  }
-
-  .media-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .media-item {
+@media (max-width: 480px) {
+  .media-item img,
+  .media-item video {
     height: 130px;
-  }
-
-  .post-title {
-    font-size: 18px;
-  }
-
-  .post-content {
-    font-size: 14px;
-  }
-
-  .vote-box {
-    padding: 6px 12px;
   }
 }
