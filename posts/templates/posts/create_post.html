@@ -5,88 +5,105 @@
     <meta charset="UTF-8" />
     <title>Create Post</title>
 
-    <!-- LOAD ONLY create_post.css -->
+    <!-- Navbar & Page Styles -->
+    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
     <link rel="stylesheet" href="{% static 'posts/css/create_post.css' %}" />
   </head>
 
   <body>
     {% include 'posts/navbar.html' %}
-    <!-- DO NOT load navbar.css here -->
 
-    <div class="container">
-      <h1>Create Post</h1>
+    <div class="create-wrapper">
+      <div class="create-card">
+        <h1>Create Post</h1>
 
-      <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
 
-        <!-- TITLE -->
-        <div class="form-group">
-          <label>Title</label>
-          <input type="text" name="title" placeholder="Enter your post title" />
-        </div>
-
-        <!-- SUMMARY -->
-        <div class="form-group">
-          <label>Summary</label>
-          <div class="textarea-wrapper">
-            <textarea
-              id="summary"
-              name="content"
-              placeholder="Write a short summary..."
-            ></textarea>
-            <div class="word-count" id="wordCount">Word count: 0</div>
-          </div>
-
-          <div class="add-bar">
-            <span id="addImageBtn"
-              ><span class="plus">+</span> Add Pictures</span
-            >
-            <span id="addVideoBtn"><span class="plus">+</span> Add Video</span>
-            <span id="addSourceBtn"
-              ><span class="plus">+</span> Add Source</span
-            >
-          </div>
-
-          <div id="previewArea" class="preview-area">
+          <!-- TITLE -->
+          <div class="form-group">
+            <label>Title</label>
             <input
-              type="file"
-              id="imageInput"
-              name="images"
-              multiple
-              accept="image/*"
+              type="text"
+              name="title"
+              placeholder="Enter your post title"
             />
-            <input type="file" id="videoInput" name="video" accept="video/*" />
-            <input type="file" id="sourceInput" name="sources" multiple />
-
-            <div id="thumbnailContainer" class="thumbnail-container"></div>
-            <div id="combinedPreview"></div>
-            <div id="previewStatusBar" class="preview-status"></div>
           </div>
-        </div>
 
-        <!-- CATEGORY -->
-        <div class="form-group" style="position: relative">
-          <label>Category</label>
-          <input
-            id="categoryInput"
-            name="category"
-            type="text"
-            placeholder="Start typing a category..."
-          />
-          <div id="categorySuggestions"></div>
-        </div>
+          <!-- SUMMARY -->
+          <div class="form-group">
+            <label>Summary</label>
+            <div class="textarea-wrapper">
+              <textarea
+                id="summary"
+                name="content"
+                placeholder="Write a short summary..."
+              ></textarea>
+              <div class="word-count" id="wordCount">Word count: 0</div>
+            </div>
 
-        <div class="button-row">
-          <button type="submit" class="btn-primary">Submit</button>
-          <button
-            type="button"
-            onclick="window.location.href='/'"
-            class="btn-secondary"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+            <!-- ADD BAR -->
+            <div class="add-bar">
+              <span id="addImageBtn"
+                ><span class="plus">+</span> Add Pictures</span
+              >
+              <span id="addVideoBtn"
+                ><span class="plus">+</span> Add Video</span
+              >
+              <span id="addSourceBtn"
+                ><span class="plus">+</span> Add Source</span
+              >
+            </div>
+
+            <!-- PREVIEW -->
+            <div id="previewArea" class="preview-area">
+              <input
+                type="file"
+                id="imageInput"
+                name="images"
+                multiple
+                accept="image/*"
+              />
+              <input
+                type="file"
+                id="videoInput"
+                name="video"
+                accept="video/*"
+              />
+              <input type="file" id="sourceInput" name="sources" multiple />
+
+              <div id="thumbnailContainer" class="thumbnail-container"></div>
+              <div id="combinedPreview"></div>
+
+              <div id="previewStatusBar" class="preview-status"></div>
+            </div>
+          </div>
+
+          <!-- CATEGORY -->
+          <div class="form-group" style="position: relative">
+            <label>Category</label>
+            <input
+              id="categoryInput"
+              name="category"
+              type="text"
+              placeholder="Start typing a category..."
+            />
+            <div id="categorySuggestions"></div>
+          </div>
+
+          <!-- BUTTONS -->
+          <div class="button-row">
+            <button type="submit" class="btn-primary">Submit</button>
+            <button
+              type="button"
+              onclick="window.location.href='/'"
+              class="btn-secondary"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script src="{% static 'posts/js/create_post.js' %}"></script>
