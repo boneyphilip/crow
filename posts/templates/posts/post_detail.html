@@ -113,7 +113,7 @@
     <!-- ✔ COMMENT SECTION ALSO INSIDE FEED WRAPPER -->
     <div class="feed-wrapper" id="comments">
       <div class="comments-section">
-        <h3 class="section-title">Comments ({{ post.comments.count }})</h3>
+        <h3 class="section-title">Comments • {{ post.comments.count }}</h3>
 
         <!-- ADD COMMENT -->
         {% if user.is_authenticated %}
@@ -143,7 +143,7 @@
             <div>
               <span class="comment-author">{{ comment.author.username }}</span>
               <span class="comment-time"
-                >{{ comment.created_at|naturaltime|clean_time }}</span
+                >• {{ comment.created_at|naturaltime|clean_time }}</span
               >
             </div>
           </div>
@@ -176,7 +176,7 @@
               <div>
                 <span class="reply-author">{{ reply.author.username }}</span>
                 <span class="reply-time"
-                  >{{ reply.created_at|naturaltime }}</span
+                  >• {{ reply.created_at|naturaltime }}</span
                 >
               </div>
             </div>

@@ -237,9 +237,29 @@ body {
   font-size: 14px;
 }
 
+.comment-author {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.comment-time {
+  font-size: 12px;
+  color: #666;
+}
+
 /* ---------------------------------------------------------
    REPLIES (Indented)
 ---------------------------------------------------------- */
+.reply-author {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.reply-time {
+  font-size: 12px;
+  color: #666;
+}
+
 .reply-card {
   margin-left: 45px;
   padding-left: 14px;
