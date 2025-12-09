@@ -4,180 +4,224 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>{{ post.title }} — Crow</title>
+    <title>{{ post.title }}</title>
+
+    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
     <link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}" />
   </head>
 
   <body>
     {% include 'posts/navbar.html' %}
-    <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
 
-    <a href="/" class="back-link">← Back to Home</a>
+    <!-- ✔ SAME WRAPPER AS HOME PAGE -->
+    <div class="feed-wrapper">
+      <!-- MAIN POST CARD -->
+      <div class="post-card">
+        <!-- HEADER -->
+        <div class="post-header">
+          <img
+            src="https://ui-avatars.com/api/?name={{ post.author.username }}"
+            class="post-avatar"
+          />
 
-    <!-- MAIN POST CARD -->
-    <div class="post-card">
-      <div class="post-header">
-        <img
-          src="https://ui-avatars.com/api/?name={{ post.author.username }}"
-          class="post-avatar"
-        />
-
-        <div class="post-meta">
-          <span class="post-author">{{ post.author.username }}</span>
-          <span class="post-time"
-            >• {{ post.created_at|naturaltime|clean_time }}</span
-          >
-
-          {% if post.category %}
-          <span class="post-category">{{ post.category.name }}</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <h1 class="post-title">{{ post.title }}</h1>
-      <p class="post-content">{{ post.content }}</p>
-
-      <div class="post-media-section">
-        {% for media in post.media.all %} {% if media.is_image %}
-        <img src="{{ media.file.url }}" class="detail-media" />
-
-        {% elif media.is_video %}
-        <video class="detail-media" controls>
-          <source src="{{ media.file.url }}" type="video/mp4" />
-        </video>
-
-        {% else %}
-        <a href="{{ media.file.url }}" class="detail-file" download>
-          📄 Download Attachment
-        </a>
-
-        {% endif %} {% endfor %}
-      </div>
-
-      <!-- SHOW EDIT BUTTON ONLY TO AUTHOR -->
-      {% if user == post.author %}
-      <a href="{% url 'edit_post' post.id %}" class="edit-btn">Edit</a>
-      <a
-        href="{% url 'delete_post' post.id %}"
-        class="delete-btn"
-        style="color: red"
-        >Delete</a
-      >
-      {% endif %}
-
-      <div class="post-actions">
-        <div class="vote-box">
-          {% if user.is_authenticated %}
-          <button
-            class="vote-btn"
-            data-post-id="{{ post.id }}"
-            data-action="upvote"
-          >
-            ▲
-          </button>
-          {% else %}
-          <span class="disabled-vote">▲</span>
-          {% endif %}
-
-          <!-- ALWAYS SHOW THE NUMBER -->
-          <span class="vote-count" id="detail-vote-count">
-            {{ post.upvotes }}
-          </span>
-
-          {% if user.is_authenticated %}
-          <button
-            class="vote-btn"
-            data-post-id="{{ post.id }}"
-            data-action="downvote"
-          >
-            ▼
-          </button>
-          {% else %}
-          <span class="disabled-vote">▼</span>
-          {% endif %}
-        </div>
-
-        <div class="comment-count">💬 {{ post.comments.count }} Comments</div>
-
-        <div class="share-btn">↗ Share</div>
-      </div>
-    </div>
-
-    <!-- COMMENTS CARD -->
-    <div class="comments-card">
-      <h2 class="comments-title">Comments</h2>
-
-      <!-- ADD COMMENT FORM -->
-      <form
-        method="post"
-        action="{% url 'add_comment' post.id %}"
-        class="comment-form"
-      >
-        {% csrf_token %}
-        <textarea
-          name="content"
-          class="comment-input"
-          placeholder="Write a comment..."
-        ></textarea>
-        <button class="comment-submit">Comment</button>
-      </form>
-
-      <div class="comment-list">
-        {% for comment in post.comments.all %}
-        <div class="comment-box">
-          <div class="comment-info">
-            <span class="comment-author">{{ comment.author.username }}</span>
-            <span class="comment-time"
-              >• {{ comment.created_at|naturaltime|clean_time }}</span
+          <div class="post-meta">
+            <span class="post-author">{{ post.author.username }}</span>
+            <span class="post-time"
+              >• {{ post.created_at|naturaltime|clean_time }}</span
             >
+
+            {% if post.category %}
+            <span class="post-category">{{ post.category.name }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- TITLE -->
+        <h2 class="post-title">{{ post.title }}</h2>
+
+        <!-- CONTENT -->
+        <p class="post-content">{{ post.content }}</p>
+
+        <!-- MEDIA -->
+        {% if post.media.count == 1 %} {% with m=post.media.first %}
+        <div class="media-single">
+          {% if m.is_image %}
+          <img src="{{ m.file.url }}" class="media-single-img" />
+          {% elif m.is_video %}
+          <video controls class="media-single-video">
+            <source src="{{ m.file.url }}" type="video/mp4" />
+          </video>
+          {% endif %}
+        </div>
+        {% endwith %} {% else %}
+        <div class="media-grid">
+          {% for media in post.media.all %}
+          <div class="media-item">
+            {% if media.is_image %}
+            <img src="{{ media.file.url }}" />
+            {% elif media.is_video %}
+            <video muted>
+              <source src="{{ media.file.url }}" type="video/mp4" />
+            </video>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ACTION BAR (Home page style) -->
+        <div class="post-actions">
+          <div class="vote-box">
+            {% if user.is_authenticated %}
+            <button
+              class="vote-btn"
+              data-post-id="{{ post.id }}"
+              data-action="upvote"
+            >
+              ▲
+            </button>
+            {% else %}
+            <span class="disabled-vote">▲</span>
+            {% endif %}
+
+            <span class="vote-count">{{ post.upvotes }}</span>
+
+            {% if user.is_authenticated %}
+            <button
+              class="vote-btn"
+              data-post-id="{{ post.id }}"
+              data-action="downvote"
+            >
+              ▼
+            </button>
+            {% else %}
+            <span class="disabled-vote">▼</span>
+            {% endif %}
+          </div>
+
+          <a href="#comments" class="action-btn">
+            💬 {{ post.comments.count }} Comments
+          </a>
+
+          <div class="action-btn">↗ Share</div>
+        </div>
+      </div>
+      <!-- end .post-card -->
+    </div>
+    <!-- end .feed-wrapper -->
+
+    <!-- ✔ COMMENT SECTION ALSO INSIDE FEED WRAPPER -->
+    <div class="feed-wrapper" id="comments">
+      <div class="comments-section">
+        <h3 class="section-title">Comments ({{ post.comments.count }})</h3>
+
+        <!-- ADD COMMENT -->
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'add_comment' post.id %}">
+          {% csrf_token %}
+          <textarea
+            name="content"
+            class="comment-box"
+            placeholder="Write a comment..."
+          ></textarea>
+          <button class="comment-submit">Post Comment</button>
+        </form>
+        {% else %}
+        <p class="login-hint">
+          <a href="/login/">Login</a> to write a comment.
+        </p>
+        {% endif %}
+
+        <!-- COMMENTS LOOP -->
+        {% for comment in post.comments.all %}
+        <div class="comment-card">
+          <div class="comment-header">
+            <img
+              src="https://ui-avatars.com/api/?name={{ comment.author.username }}"
+              class="comment-avatar"
+            />
+            <div>
+              <span class="comment-author">{{ comment.author.username }}</span>
+              <span class="comment-time"
+                >{{ comment.created_at|naturaltime|clean_time }}</span
+              >
+            </div>
           </div>
 
           <p class="comment-text">{{ comment.content }}</p>
-          {% if user == comment.author %}
-          <a href="{% url 'delete_comment' comment.id %}" style="color: red"
-            >Delete</a
-          >
-          {% endif %} {% if user == comment.author %}
-          <a href="{% url 'edit_comment' comment.id %}">Edit</a>
-          {% endif %}
 
-          <!-- Reply Button -->
-          <button class="reply-toggle" data-id="{{ comment.id }}">Reply</button>
+          <div class="comment-actions">
+            {% if user.is_authenticated %}
+            <span class="reply-btn" onclick="toggleReply({{ comment.id }})"
+              >Reply</span
+            >
+            {% endif %} {% if user == comment.author %}
+            <a href="{% url 'edit_comment' comment.id %}" class="edit-btn"
+              >Edit</a
+            >
+            <a href="{% url 'delete_comment' comment.id %}" class="delete-btn"
+              >Delete</a
+            >
+            {% endif %}
+          </div>
 
-          <!-- Reply Form -->
+          <!-- REPLIES -->
+          {% for reply in comment.replies.all %}
+          <div class="reply-card">
+            <div class="reply-header">
+              <img
+                src="https://ui-avatars.com/api/?name={{ reply.author.username }}"
+                class="reply-avatar"
+              />
+              <div>
+                <span class="reply-author">{{ reply.author.username }}</span>
+                <span class="reply-time"
+                  >{{ reply.created_at|naturaltime }}</span
+                >
+              </div>
+            </div>
+
+            <p class="reply-text">{{ reply.content }}</p>
+
+            {% if user == reply.author %}
+            <div class="reply-actions">
+              <a href="{% url 'edit_comment' reply.id %}" class="edit-btn"
+                >Edit</a
+              >
+              <a href="{% url 'delete_comment' reply.id %}" class="delete-btn"
+                >Delete</a
+              >
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+
+          <!-- REPLY FORM -->
+          {% if user.is_authenticated %}
           <form
-            method="post"
+            method="POST"
             action="{% url 'reply_comment' comment.id %}"
-            id="reply-form-{{ comment.id }}"
-            class="reply-form"
-            style="display: none"
+            id="reply-box-{{ comment.id }}"
+            class="reply-form hidden"
           >
             {% csrf_token %}
             <textarea
               name="content"
               class="reply-input"
-              placeholder="Write a reply..."
+              placeholder="Reply..."
             ></textarea>
             <button class="reply-submit">Reply</button>
           </form>
-
-          <!-- Replies -->
-          {% for reply in comment.replies.all %}
-          <div class="reply-box">
-            <div class="reply-info">
-              <span class="reply-author">{{ reply.author.username }}</span>
-              <span class="reply-time"
-                >• {{ reply.created_at|naturaltime|clean_time }}</span
-              >
-            </div>
-
-            <p class="reply-text">{{ reply.content }}</p>
-          </div>
-          {% endfor %}
+          {% endif %}
         </div>
         {% endfor %}
       </div>
     </div>
-    <script src="{% static 'posts/js/post_detail.js' %}"></script>
+
+    <script>
+      function toggleReply(id) {
+        document.getElementById("reply-box-" + id).classList.toggle("hidden");
+      }
+    </script>
   </body>
 </html>
