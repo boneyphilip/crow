@@ -35,7 +35,8 @@ urlpatterns = [
     path("reply/<int:comment_id>/", views.reply_comment, name="reply_comment"),
 
     # ---------- CATEGORY (AJAX) ----------
-    path("categories/search/", views.search_categories, name="search_categories"),
-    path("categories/create/", views.ajax_create_category,
-         name="ajax_create_category"),
+    path("categories/search/", views.category_search, name="category_search"),
+    # ---------- CATEGORY (AJAX) ----------
+    path("categories/search/", views.category_search, name="category_search"),
+
 ]

@@ -1,6 +1,6 @@
 /* ============================================================
    ELEMENT REFERENCES
-============================================================ */
+============================================================= */
 const addImageBtn = document.getElementById("addImageBtn");
 const addVideoBtn = document.getElementById("addVideoBtn");
 const addSourceBtn = document.getElementById("addSourceBtn");
@@ -16,14 +16,14 @@ const previewStatusBar = document.getElementById("previewStatusBar");
 
 /* ============================================================
    OPEN FILE PICKERS
-============================================================ */
+============================================================= */
 addImageBtn.onclick = () => imageInput.click();
 addVideoBtn.onclick = () => videoInput.click();
 addSourceBtn.onclick = () => sourceInput.click();
 
 /* ============================================================
    IMAGE UPLOAD — THUMBNAIL
-============================================================ */
+============================================================= */
 imageInput.addEventListener("change", function () {
   previewArea.style.display = "block";
 
@@ -58,7 +58,7 @@ imageInput.addEventListener("change", function () {
 
 /* ============================================================
    VIDEO UPLOAD — SMALL THUMBNAIL + REMOVE BUTTON
-============================================================ */
+============================================================= */
 videoInput.addEventListener("change", function () {
   previewArea.style.display = "block";
 
@@ -89,7 +89,7 @@ videoInput.addEventListener("change", function () {
 
 /* ============================================================
    DOCUMENT UPLOAD — ICON + SHORT FILE NAME + REMOVE BTN
-============================================================ */
+============================================================= */
 sourceInput.addEventListener("change", function () {
   previewArea.style.display = "block";
 
@@ -115,20 +115,16 @@ sourceInput.addEventListener("change", function () {
     wrapper.appendChild(icon);
     wrapper.appendChild(removeBtn);
 
-    // ---- Filename shortening with extension ----
     const ext = file.name.split(".").pop();
-    const baseName = file.name.replace("." + ext, "");
-
-    const shortName =
-      baseName.length > 10 ? baseName.substring(0, 10) + "…" : baseName;
+    const base = file.name.replace("." + ext, "");
+    const shortBase = base.length > 10 ? base.substring(0, 10) + "…" : base;
 
     const label = document.createElement("div");
     label.classList.add("doc-label");
-    label.textContent = `${shortName}.${ext}`;
+    label.textContent = `${shortBase}.${ext}`;
 
     card.appendChild(wrapper);
     card.appendChild(label);
-
     combinedPreview.appendChild(card);
   });
 
@@ -137,7 +133,7 @@ sourceInput.addEventListener("change", function () {
 
 /* ============================================================
    STATUS BAR UPDATE
-============================================================ */
+============================================================= */
 function updateStatus() {
   const imgCount = thumbnailContainer.children.length;
   const vidCount = combinedPreview.querySelectorAll("video").length;
@@ -145,3 +141,64 @@ function updateStatus() {
 
   previewStatusBar.textContent = `Images: ${imgCount} | Video: ${vidCount} | Sources: ${docCount}`;
 }
+
+/* ============================================================
+   CATEGORY LIVE SEARCH (FULLY FIXED)
+============================================================ */
+
+const CATEGORY_API = "/categories/search/?q=";
+
+const input = document.getElementById("categoryInput");
+const bubbleBox = document.getElementById("categoryBubbleBox");
+
+input.addEventListener("input", async function () {
+  const query = this.value.trim();
+  bubbleBox.innerHTML = "";
+
+  if (query.length === 0) return;
+
+  // Fetch backend categories
+  const res = await fetch(CATEGORY_API + query);
+  const data = await res.json();
+  // data.results = ["Cars", "Car Photos", "Cargo"] etc.
+
+  /* ---------------------------------------------
+        Show existing matched category bubbles
+    --------------------------------------------- */
+  data.results.slice(0, 5).forEach((cat) => {
+    const b = document.createElement("div");
+    b.classList.add("category-bubble");
+    b.textContent = cat;
+
+    b.onclick = () => {
+      input.value = cat;
+      bubbleBox.innerHTML = "";
+    };
+
+    bubbleBox.appendChild(b);
+  });
+
+  /* ---------------------------------------------------
+         Check if the typed category exists EXACTLY
+           (case-insensitive)
+    --------------------------------------------------- */
+  const existsExact = data.results.some(
+    (cat) => cat.toLowerCase().trim() === query.toLowerCase().trim()
+  );
+
+  /* ---------------------------------------------------
+         Show "+ Create ..." ONLY if category does not exist
+    --------------------------------------------------- */
+  if (!existsExact) {
+    const createBubble = document.createElement("div");
+    createBubble.classList.add("category-bubble", "category-create");
+    createBubble.textContent = `+ Create "${query}"`;
+
+    createBubble.onclick = () => {
+      input.value = query;
+      bubbleBox.innerHTML = "";
+    };
+
+    bubbleBox.appendChild(createBubble);
+  }
+});

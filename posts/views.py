@@ -126,43 +126,17 @@ def upvote_post(request, post_id):
     return redirect("home")
 
 
-# ==================================================
-# CATEGORY LIVE SEARCH — AJAX
-# ==================================================
-def search_categories(request):
-    query = request.GET.get("q", "").strip()
+def category_search(request):
+    q = request.GET.get("q", "").strip()
 
-    categories = Category.objects.filter(name__icontains=query)
-    results = list(categories.values_list("name", flat=True))
+    if not q:
+        return JsonResponse({"results": []})
 
-    exists = Category.objects.filter(name__iexact=query).exists()
+    categories = Category.objects.filter(name__icontains=q)[:6]
 
-    return JsonResponse({
-        "results": results,
-        "exists": exists,
-        "typed": query,
-    })
+    data = {"results": [{"name": c.name} for c in categories]}
 
-
-# ==================================================
-# CREATE CATEGORY — AJAX
-# ==================================================
-def ajax_create_category(request):
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-
-        if not name:
-            return JsonResponse({"success": False, "error": "Empty name"}, status=400)
-
-        category, created = Category.objects.get_or_create(name=name)
-
-        return JsonResponse({
-            "success": True,
-            "created": created,
-            "name": category.name,
-        })
-
-    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+    return JsonResponse(data)
 
 
 # ==================================================
@@ -386,4 +360,17 @@ def profile_page(request, username):
     return render(request, "posts/profile.html", {
         "profile_user": profile_user,
         "posts": posts
+    })
+
+
+def category_search(request):
+    q = request.GET.get("q", "").strip()
+
+    if not q:
+        return JsonResponse({"results": []})
+
+    categories = Category.objects.filter(name__icontains=q)[:6]
+
+    return JsonResponse({
+        "results": [c.name for c in categories]
     })

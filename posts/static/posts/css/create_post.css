@@ -257,6 +257,43 @@ textarea {
 }
 
 /* ============================================================
+   CATEGORY BUBBLE UI
+============================================================ */
+.category-bubble-box {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-bubble {
+  padding: 6px 12px;
+  background: #eaf3ff;
+  color: #1a73e8;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid #d0e3ff;
+  transition: 0.2s;
+}
+
+.category-bubble:hover {
+  background: #1a73e8;
+  color: white;
+}
+
+.category-create {
+  background: #e8ffee;
+  color: #0c9a40;
+  border: 1px solid #b9f0cb;
+}
+.category-create:hover {
+  background: #0c9a40;
+  color: white;
+}
+
+/* ============================================================
    RESPONSIVE
 ============================================================ */
 @media (max-width: 540px) {
