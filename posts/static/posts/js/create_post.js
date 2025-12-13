@@ -1,6 +1,6 @@
 /* ============================================================
    ELEMENT REFERENCES
-============================================================= */
+============================================================ */
 const addImageBtn = document.getElementById("addImageBtn");
 const addVideoBtn = document.getElementById("addVideoBtn");
 const addSourceBtn = document.getElementById("addSourceBtn");
@@ -22,30 +22,56 @@ const wordCounter = document.getElementById("wordCount");
 
 summaryBox.addEventListener("input", () => {
   const text = summaryBox.value.trim();
-
-  // Count words by splitting on spaces
   const words = text.length === 0 ? 0 : text.split(/\s+/).length;
-
   wordCounter.textContent = `Word count: ${words}`;
 });
 
 /* ============================================================
+   TOAST POPUP
+============================================================ */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+
+  setTimeout(() => {
+    t.classList.remove("show");
+  }, 1800);
+}
+
+/* ============================================================
    OPEN FILE PICKERS
-============================================================= */
+============================================================ */
 addImageBtn.onclick = () => imageInput.click();
 addVideoBtn.onclick = () => videoInput.click();
 addSourceBtn.onclick = () => sourceInput.click();
 
 /* ============================================================
-   IMAGE UPLOAD — THUMBNAIL
-============================================================= */
+   UPLOAD LIMITS
+============================================================ */
+const MAX_IMAGES = 5;
+const MAX_VIDEOS = 1;
+const MAX_DOCS = 5;
+
+/* ============================================================
+   IMAGE UPLOAD (with limit)
+============================================================ */
 imageInput.addEventListener("change", function () {
+  const current = thumbnailContainer.children.length;
+  const incoming = this.files.length;
+
+  if (current + incoming > MAX_IMAGES) {
+    showToast(`You can upload max ${MAX_IMAGES} images.`);
+    this.value = "";
+    return;
+  }
+
   previewArea.style.display = "block";
 
   [...this.files].forEach((file) => {
     const reader = new FileReader();
 
-    reader.onload = function (e) {
+    reader.onload = (e) => {
       const thumb = document.createElement("div");
       thumb.classList.add("thumbnail");
 
@@ -72,40 +98,58 @@ imageInput.addEventListener("change", function () {
 });
 
 /* ============================================================
-   VIDEO UPLOAD — SMALL THUMBNAIL + REMOVE BUTTON
-============================================================= */
+   VIDEO UPLOAD (with limit)
+============================================================ */
 videoInput.addEventListener("change", function () {
+  const already = combinedPreview.querySelectorAll("video").length;
+
+  if (already >= MAX_VIDEOS) {
+    showToast("Only 1 video allowed.");
+    this.value = "";
+    return;
+  }
+
   previewArea.style.display = "block";
 
-  [...this.files].forEach((file) => {
-    const box = document.createElement("div");
-    box.classList.add("thumbnail");
+  const file = this.files[0];
+  if (!file) return;
 
-    const video = document.createElement("video");
-    video.src = URL.createObjectURL(file);
-    video.controls = true;
-    video.muted = true;
+  const box = document.createElement("div");
+  box.classList.add("thumbnail");
 
-    const removeBtn = document.createElement("button");
-    removeBtn.classList.add("remove-btn");
-    removeBtn.innerHTML = "×";
-    removeBtn.onclick = () => {
-      box.remove();
-      updateStatus();
-    };
+  const video = document.createElement("video");
+  video.src = URL.createObjectURL(file);
+  video.controls = true;
+  video.muted = true;
 
-    box.appendChild(video);
-    box.appendChild(removeBtn);
-    combinedPreview.appendChild(box);
-  });
+  const removeBtn = document.createElement("button");
+  removeBtn.classList.add("remove-btn");
+  removeBtn.innerHTML = "×";
+  removeBtn.onclick = () => {
+    box.remove();
+    updateStatus();
+  };
+
+  box.appendChild(video);
+  box.appendChild(removeBtn);
+  combinedPreview.appendChild(box);
 
   updateStatus();
 });
 
 /* ============================================================
-   DOCUMENT UPLOAD — ICON + SHORT FILE NAME + REMOVE BTN
-============================================================= */
+   DOCUMENT UPLOAD (with limit)
+============================================================ */
 sourceInput.addEventListener("change", function () {
+  const current = combinedPreview.querySelectorAll(".doc-card").length;
+  const incoming = this.files.length;
+
+  if (current + incoming > MAX_DOCS) {
+    showToast(`Max ${MAX_DOCS} documents allowed.`);
+    this.value = "";
+    return;
+  }
+
   previewArea.style.display = "block";
 
   [...this.files].forEach((file) => {
@@ -132,11 +176,11 @@ sourceInput.addEventListener("change", function () {
 
     const ext = file.name.split(".").pop();
     const base = file.name.replace("." + ext, "");
-    const shortBase = base.length > 10 ? base.substring(0, 10) + "…" : base;
+    const short = base.length > 10 ? base.substring(0, 10) + "…" : base;
 
     const label = document.createElement("div");
     label.classList.add("doc-label");
-    label.textContent = `${shortBase}.${ext}`;
+    label.textContent = `${short}.${ext}`;
 
     card.appendChild(wrapper);
     card.appendChild(label);
@@ -148,19 +192,18 @@ sourceInput.addEventListener("change", function () {
 
 /* ============================================================
    STATUS BAR UPDATE
-============================================================= */
+============================================================ */
 function updateStatus() {
   const imgCount = thumbnailContainer.children.length;
   const vidCount = combinedPreview.querySelectorAll("video").length;
-  const docCount = combinedPreview.querySelectorAll(".doc-wrapper").length;
+  const docCount = combinedPreview.querySelectorAll(".doc-card").length;
 
   previewStatusBar.textContent = `Images: ${imgCount} | Video: ${vidCount} | Sources: ${docCount}`;
 }
 
 /* ============================================================
-   CATEGORY LIVE SEARCH (FULLY FIXED)
+   CATEGORY LIVE SEARCH  (unchanged)
 ============================================================ */
-
 const CATEGORY_API = "/categories/search/?q=";
 
 const input = document.getElementById("categoryInput");
@@ -170,50 +213,34 @@ input.addEventListener("input", async function () {
   const query = this.value.trim();
   bubbleBox.innerHTML = "";
 
-  if (query.length === 0) return;
+  if (!query) return;
 
-  // Fetch backend categories
   const res = await fetch(CATEGORY_API + query);
   const data = await res.json();
-  // data.results = ["Cars", "Car Photos", "Cargo"] etc.
 
-  /* ---------------------------------------------
-        Show existing matched category bubbles
-    --------------------------------------------- */
   data.results.slice(0, 5).forEach((cat) => {
     const b = document.createElement("div");
     b.classList.add("category-bubble");
     b.textContent = cat;
-
     b.onclick = () => {
       input.value = cat;
       bubbleBox.innerHTML = "";
     };
-
     bubbleBox.appendChild(b);
   });
 
-  /* ---------------------------------------------------
-         Check if the typed category exists EXACTLY
-           (case-insensitive)
-    --------------------------------------------------- */
   const existsExact = data.results.some(
-    (cat) => cat.toLowerCase().trim() === query.toLowerCase().trim()
+    (cat) => cat.toLowerCase() === query.toLowerCase()
   );
 
-  /* ---------------------------------------------------
-         Show "+ Create ..." ONLY if category does not exist
-    --------------------------------------------------- */
   if (!existsExact) {
-    const createBubble = document.createElement("div");
-    createBubble.classList.add("category-bubble", "category-create");
-    createBubble.textContent = `+ Create "${query}"`;
-
-    createBubble.onclick = () => {
+    const create = document.createElement("div");
+    create.classList.add("category-bubble", "category-create");
+    create.textContent = `+ Create "${query}"`;
+    create.onclick = () => {
       input.value = query;
       bubbleBox.innerHTML = "";
     };
-
-    bubbleBox.appendChild(createBubble);
+    bubbleBox.appendChild(create);
   }
 });
