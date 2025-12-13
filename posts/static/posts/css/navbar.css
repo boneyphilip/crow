@@ -183,3 +183,27 @@ body {
     gap: 18px;
   }
 }
+/* Make logout form behave like a normal dropdown item */
+.logout-form {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* Make logout button look exactly like a .pm-item link */
+.logout-link {
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: red; /* same as your old logout style */
+  font-size: 14px;
+  font-family: inherit;
+}
+
+/* Hover matches .pm-item hover */
+.logout-link:hover {
+  background: #f7f7f7;
+}

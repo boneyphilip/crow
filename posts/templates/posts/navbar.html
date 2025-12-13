@@ -58,7 +58,11 @@
       <div class="profile-menu">
         {% if user.is_authenticated %}
         <a href="/profile/{{ user.username }}/" class="pm-item">Profile</a>
-        <a href="/logout/" class="pm-item logout">Logout</a>
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+          {% csrf_token %}
+          <button type="submit" class="pm-item logout-link">Logout</button>
+        </form>
+
         {% else %}
         <a href="/login/" class="pm-item">Sign In</a>
         <a href="/register/" class="pm-item">Create Account</a>
