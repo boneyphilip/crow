@@ -68,18 +68,21 @@
           <div class="media-single-doc">📄 {{ m.file.name }}</div>
           {% endif %}
         </div>
-        {% endwith %} {{% elif post.media.count > 1 %}
+        {% endwith %} {% elif post.media.count > 1 %}
 
         <div class="media-gallery" id="gallery-{{ post.id }}">
+          <!-- Slides container -->
           <div class="gallery-track">
             {% for media in post.media.all %}
             <div class="gallery-item">
               {% if media.is_image %}
               <img src="{{ media.file.url }}" alt="image" />
+
               {% elif media.is_video %}
               <video controls muted>
                 <source src="{{ media.file.url }}" type="video/mp4" />
               </video>
+
               {% else %}
               <div class="doc-slide">
                 📄 {{ media.file.name|truncatechars:22 }}
@@ -89,12 +92,16 @@
             {% endfor %}
           </div>
 
-          <!-- Navigation -->
+          <!-- Navigation buttons -->
           <button class="gallery-prev" data-id="{{ post.id }}">‹</button>
           <button class="gallery-next" data-id="{{ post.id }}">›</button>
 
-          <!-- Dots -->
-          <div class="gallery-dots" id="dots-{{ post.id }}"></div>
+          <!-- Dots (auto-generated) -->
+          <div class="gallery-dots">
+            {% for media in post.media.all %}
+            <span class="{% if forloop.first %}active{% endif %}"></span>
+            {% endfor %}
+          </div>
         </div>
 
         {% endif %}
