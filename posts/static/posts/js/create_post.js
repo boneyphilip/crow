@@ -15,6 +15,21 @@ const combinedPreview = document.getElementById("combinedPreview");
 const previewStatusBar = document.getElementById("previewStatusBar");
 
 /* ============================================================
+   WORD COUNT 
+============================================================ */
+const summaryBox = document.getElementById("summary");
+const wordCounter = document.getElementById("wordCount");
+
+summaryBox.addEventListener("input", () => {
+  const text = summaryBox.value.trim();
+
+  // Count words by splitting on spaces
+  const words = text.length === 0 ? 0 : text.split(/\s+/).length;
+
+  wordCounter.textContent = `Word count: ${words}`;
+});
+
+/* ============================================================
    OPEN FILE PICKERS
 ============================================================= */
 addImageBtn.onclick = () => imageInput.click();
