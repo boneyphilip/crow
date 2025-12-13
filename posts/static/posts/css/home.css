@@ -4,7 +4,7 @@
 body {
   background: #f5f5f5;
   margin: 0;
-  padding-top: 72px; /* navbar space */
+  padding-top: 72px;
   font-family: "Inter", sans-serif;
 }
 
@@ -67,7 +67,6 @@ body {
   font-size: 12px;
 }
 
-/* Category Badge */
 .post-category {
   background: #eaf3ff;
   color: #1a73e8;
@@ -94,10 +93,8 @@ body {
 }
 
 /* ============================================================
-   MEDIA DISPLAY
+   MEDIA — SINGLE FILE (Image or Video)
 ============================================================ */
-
-/* 1 Image — big Instagram-style */
 .media-single {
   margin-top: 12px;
 }
@@ -109,7 +106,9 @@ body {
   background: #000;
 }
 
-/* Multiple image grid */
+/* ============================================================
+   MEDIA GRID (Deprecated but kept for safety)
+============================================================ */
 .media-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -125,7 +124,7 @@ body {
   border-radius: 8px;
 }
 
-/* Doc preview */
+/* Document (single) */
 .media-single-doc {
   padding: 16px;
   background: #eee;
@@ -134,7 +133,108 @@ body {
 }
 
 /* ============================================================
-   POST CONTROLS (Edit/Delete)
+   REDDIT-STYLE GALLERY (New System)
+============================================================ */
+.media-gallery {
+  width: 100%;
+  height: 420px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+  margin-top: 12px;
+}
+
+/* Horizontal slide track */
+.gallery-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.35s ease;
+}
+
+/* Each slide */
+.gallery-item {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-item img,
+.gallery-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Document slide */
+.doc-slide {
+  background: #f2f2f2;
+  width: 70%;
+  height: 60%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  color: #444;
+}
+
+/* Navigation arrows */
+.gallery-prev,
+.gallery-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 26px;
+  line-height: 26px;
+  transition: 0.2s;
+}
+
+.gallery-prev {
+  left: 10px;
+}
+.gallery-next {
+  right: 10px;
+}
+
+.gallery-prev:hover,
+.gallery-next:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* Dots */
+.gallery-dots {
+  position: absolute;
+  bottom: 12px;
+  width: 100%;
+  text-align: center;
+}
+
+.gallery-dots span {
+  height: 10px;
+  width: 10px;
+  margin: 0 3px;
+  background: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.gallery-dots .active {
+  background: white;
+}
+
+/* ============================================================
+   POST CONTROLS
 ============================================================ */
 .post-controls {
   margin-top: 12px;
@@ -149,7 +249,7 @@ body {
 }
 
 /* ============================================================
-   ACTION BAR (votes + comments)
+   ACTION BAR
 ============================================================ */
 .post-actions {
   display: flex;
@@ -194,11 +294,15 @@ body {
 }
 
 /* ============================================================
-   RESPONSIVE FIXES
+   RESPONSIVE
 ============================================================ */
 @media (max-width: 480px) {
   .media-item img,
   .media-item video {
     height: 130px;
+  }
+
+  .media-gallery {
+    height: 320px;
   }
 }
