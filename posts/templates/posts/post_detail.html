@@ -153,6 +153,7 @@
     <!-- =====================================================
      COMMENT SECTION
 ====================================================== -->
+
     <div class="feed-wrapper" id="comments">
       <div class="comments-section">
         <h3 class="section-title">Comments • {{ post.comments.count }}</h3>
@@ -174,9 +175,10 @@
         </p>
         {% endif %}
 
-        <!-- COMMENTS LOOP -->
+        <!-- COMMENTS + REPLIES -->
         {% for comment in post.comments.all %}
         <div class="comment-card">
+          <!-- COMMENT HEADER -->
           <div class="comment-header">
             <img
               src="https://ui-avatars.com/api/?name={{ comment.author.username }}"
@@ -184,14 +186,16 @@
             />
             <div>
               <span class="comment-author">{{ comment.author.username }}</span>
-              <span class="comment-time"
-                >• {{ comment.created_at|naturaltime|clean_time }}</span
-              >
+              <span class="comment-time">
+                • {{ comment.created_at|naturaltime|clean_time }}
+              </span>
             </div>
           </div>
 
+          <!-- COMMENT BODY -->
           <p class="comment-text">{{ comment.content }}</p>
 
+          <!-- COMMENT ACTIONS -->
           <div class="comment-actions">
             {% if user.is_authenticated %}
             <span class="reply-toggle" data-id="{{ comment.id }}">Reply</span>
@@ -210,9 +214,10 @@
           <div class="reply-card">
             <div class="reply-header">
               <img
-                class="reply-avatar"
                 src="https://ui-avatars.com/api/?name={{ reply.author.username }}"
+                class="reply-avatar"
               />
+
               <div>
                 <span class="reply-author">{{ reply.author.username }}</span>
                 <span class="reply-time"
@@ -239,11 +244,10 @@
           <!-- REPLY FORM -->
           {% if user.is_authenticated %}
           <form
-            id="reply-form-{{ comment.id }}"
             method="POST"
             action="{% url 'reply_comment' comment.id %}"
-            class="reply-form"
-            style="display: none"
+            id="reply-box-{{ comment.id }}"
+            class="reply-form hidden"
           >
             {% csrf_token %}
             <textarea
@@ -251,7 +255,6 @@
               class="reply-input"
               placeholder="Reply..."
             ></textarea>
-
             <button class="reply-submit">Reply</button>
           </form>
           {% endif %}

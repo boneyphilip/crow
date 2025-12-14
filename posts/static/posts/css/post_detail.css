@@ -323,25 +323,70 @@ body {
 
 .reply-form {
   margin-left: 45px;
-  margin-top: 12px;
+  margin-top: 16px; /* more height */
+  padding: 0 14px; /* small horizontal space */
+  border-left: 2px solid #eee;
 }
 
+/* Reply textarea */
 .reply-input {
   width: 100%;
-  padding: 14px;
-  border-radius: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
   border: 1px solid #ccc;
   background: #fafafa;
+  box-sizing: border-box;
+  margin-bottom: 6px;
 }
 
 .reply-submit {
-  margin-top: 6px;
+  margin-left: 0;
   padding: 8px 16px;
   border: none;
   background: #000;
   color: white;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* ---------------------------------------------------------
+   Reply Toggle Styling
+---------------------------------------------------------- */
+.reply-toggle {
+  cursor: pointer;
+  color: #1a73e8;
+  font-size: 14px;
+  user-select: none;
+}
+
+.reply-toggle:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------
+    Reply Structure
+---------------------------------------------------------- */
+.reply-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reply-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.reply-text {
+  margin: 8px 0;
+}
+
+/* ---------------------------------------------------------
+   Hide/Show Reply Form
+---------------------------------------------------------- */
+.hidden {
+  display: none !important;
 }
 
 /* ---------------------------------------------------------
