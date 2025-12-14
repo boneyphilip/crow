@@ -100,3 +100,80 @@ function getCookie(name) {
   });
   return value;
 }
+
+/* ==========================================================
+   LIGHTBOX VIEWER
+========================================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const lightbox = document.getElementById("lightbox");
+  const imgBox = document.getElementById("lightbox-img");
+  const vidBox = document.getElementById("lightbox-video");
+  const closeBtn = document.getElementById("lightbox-close");
+  const prevBtn = document.getElementById("lightbox-prev");
+  const nextBtn = document.getElementById("lightbox-next");
+
+  let mediaList = [];
+  let index = 0;
+
+  /* Open Lightbox */
+  function openLightbox(i) {
+    index = i;
+    const item = mediaList[index];
+
+    if (item.type === "image") {
+      vidBox.classList.add("hidden");
+      imgBox.classList.remove("hidden");
+      imgBox.src = item.src;
+    } else if (item.type === "video") {
+      imgBox.classList.add("hidden");
+      vidBox.classList.remove("hidden");
+      vidBox.src = item.src;
+    }
+
+    lightbox.classList.remove("hidden");
+  }
+
+  /* Close */
+  function closeLightbox() {
+    lightbox.classList.add("hidden");
+    vidBox.pause();
+  }
+
+  /* Navigation */
+  function next() {
+    index = (index + 1) % mediaList.length;
+    openLightbox(index);
+  }
+
+  function prev() {
+    index = (index - 1 + mediaList.length) % mediaList.length;
+    openLightbox(index);
+  }
+
+  /* Bind events */
+  closeBtn.addEventListener("click", closeLightbox);
+  nextBtn.addEventListener("click", next);
+  prevBtn.addEventListener("click", prev);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") next();
+    if (e.key === "ArrowLeft") prev();
+  });
+
+  /* Attach click events to all media */
+  document
+    .querySelectorAll(
+      ".media-single-img, .media-single-video, .gallery-item img, .gallery-item video"
+    )
+    .forEach((el, i, arr) => {
+      // Build media array
+      mediaList = Array.from(arr).map((m) => ({
+        src: m.tagName === "IMG" ? m.src : m.querySelector("source")?.src,
+        type: m.tagName === "IMG" ? "image" : "video",
+      }));
+
+      el.addEventListener("click", () => openLightbox(i));
+    });
+});

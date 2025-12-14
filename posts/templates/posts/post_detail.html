@@ -263,6 +263,19 @@
       </div>
     </div>
 
+    <!-- LIGHTBOX OVERLAY -->
+    <div id="lightbox" class="lightbox hidden">
+      <span id="lightbox-close" class="lightbox-close">×</span>
+
+      <button id="lightbox-prev" class="lightbox-nav">‹</button>
+      <button id="lightbox-next" class="lightbox-nav">›</button>
+
+      <div class="lightbox-content">
+        <img id="lightbox-img" class="hidden" />
+        <video id="lightbox-video" controls class="hidden"></video>
+      </div>
+    </div>
+
     <script src="{% static 'posts/js/post_detail.js' %}"></script>
   </body>
 </html>

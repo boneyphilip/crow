@@ -141,3 +141,79 @@ function getCookie(name) {
   });
   return value;
 }
+
+/* ==========================================================
+   LIGHTBOX — Only load media from clicked post 
+========================================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const lightbox = document.getElementById("lightbox");
+  const imgBox = document.getElementById("lightbox-img");
+  const vidBox = document.getElementById("lightbox-video");
+  const closeBtn = document.getElementById("lightbox-close");
+  const prevBtn = document.getElementById("lightbox-prev");
+  const nextBtn = document.getElementById("lightbox-next");
+
+  let mediaList = [];
+  let index = 0;
+
+  function openLightbox(i) {
+    index = i;
+    const item = mediaList[index];
+
+    imgBox.classList.remove("active");
+    vidBox.classList.remove("active");
+
+    if (item.type === "image") {
+      imgBox.src = item.src;
+      imgBox.classList.add("active");
+    } else {
+      vidBox.src = item.src;
+      vidBox.classList.add("active");
+    }
+
+    lightbox.classList.remove("hidden");
+  }
+
+  function closeLightbox() {
+    lightbox.classList.add("hidden");
+    vidBox.pause();
+  }
+
+  function next() {
+    index = (index + 1) % mediaList.length;
+    openLightbox(index);
+  }
+
+  function prev() {
+    index = (index - 1 + mediaList.length) % mediaList.length;
+    openLightbox(index);
+  }
+
+  closeBtn.addEventListener("click", closeLightbox);
+  nextBtn.addEventListener("click", next);
+  prevBtn.addEventListener("click", prev);
+
+  /* -------------------------------
+     CLICK HANDLING
+  -------------------------------- */
+  document.querySelectorAll(".media-gallery").forEach((gallery) => {
+    const postId = gallery.dataset.postId;
+
+    const mediaElements = gallery.querySelectorAll("img, video");
+
+    gallery.querySelectorAll("img, video").forEach((el, i) => {
+      el.style.cursor = "pointer";
+
+      el.addEventListener("click", () => {
+        // Rebuild correct mediaList only for this post
+        mediaList = Array.from(mediaElements).map((m) => ({
+          src: m.tagName === "IMG" ? m.src : m.querySelector("source").src,
+          type: m.tagName === "IMG" ? "image" : "video",
+        }));
+
+        openLightbox(i);
+      });
+    });
+  });
+});

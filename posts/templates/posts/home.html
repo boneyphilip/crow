@@ -21,7 +21,7 @@
       {% if messages %} {% for message in messages %}
       <div class="flash-message">{{ message }}</div>
       {% endfor %} {% endif %} {% for post in posts %}
-      <div class="post-card">
+      <div class="post-card" data-post-id="{{ post.id }}">
         <!-- HEADER -->
         <div class="post-header">
           <img
@@ -74,7 +74,11 @@
         {% endwith %} {% elif post.media.count > 1 %}
 
         <!-- REDDIT STYLE GALLERY -->
-        <div class="media-gallery" id="gallery-{{ post.id }}">
+        <div
+          class="media-gallery"
+          id="gallery-{{ post.id }}"
+          data-post-id="{{ post.id }}"
+        >
           <div class="gallery-track">
             {% for media in post.media.all %}
             <div class="gallery-item">
@@ -165,6 +169,19 @@
       {% empty %}
       <p class="no-posts">No posts yet. Be the first to share something!</p>
       {% endfor %}
+    </div>
+
+    <!-- LIGHTBOX OVERLAY -->
+    <div id="lightbox" class="lightbox hidden">
+      <span id="lightbox-close" class="lightbox-close">×</span>
+
+      <button id="lightbox-prev" class="lightbox-nav">‹</button>
+      <button id="lightbox-next" class="lightbox-nav">›</button>
+
+      <div class="lightbox-content">
+        <img id="lightbox-img" class="hidden" />
+        <video id="lightbox-video" controls class="hidden"></video>
+      </div>
     </div>
 
     <script src="{% static 'posts/js/home.js' %}"></script>
