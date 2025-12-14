@@ -1,30 +1,25 @@
 /* ==========================================================
    POST DETAIL — Reply Form Toggle
-   ========================================================== */
+========================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+  /* --- Reply toggle --- */
   document.body.addEventListener("click", (e) => {
     if (!e.target.classList.contains("reply-toggle")) return;
 
-    const btn = e.target;
-    const id = btn.dataset.id;
+    const id = e.target.dataset.id;
+    const box = document.getElementById(`reply-box-${id}`);
+    if (!box) return;
 
-    const form = document.getElementById(`reply-form-${id}`);
-    if (!form) return;
+    const isHidden = box.classList.contains("hidden");
+    box.classList.toggle("hidden");
 
-    const isHidden = form.style.display === "" || form.style.display === "none";
-
-    form.style.display = isHidden ? "block" : "none";
-    btn.textContent = isHidden ? "Cancel" : "Reply";
+    e.target.textContent = isHidden ? "Cancel" : "Reply";
   });
-});
 
-/* ==========================================================
-   POST DETAIL — AJAX Voting
-   ========================================================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("[DETAIL] Vote JS loaded");
+  /* ==========================================================
+     POST DETAIL — AJAX Voting
+  ========================================================== */
 
   document.body.addEventListener("click", (e) => {
     if (!e.target.classList.contains("vote-btn")) return;
@@ -45,23 +40,63 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         if (!data.success) return;
 
-        const el = document.getElementById("detail-vote-count");
-        if (el) el.textContent = data.upvotes;
+        const countEl = document.getElementById(`vote-count-${postId}`);
+        if (countEl) countEl.textContent = data.upvotes;
       })
-      .catch((err) => console.error("Vote error:", err));
+      .catch((err) => console.error(err));
+  });
+
+  /* ==========================================================
+     REDDIT-STYLE MEDIA SLIDER (MULTI MEDIA)
+  ========================================================== */
+
+  document.querySelectorAll(".media-gallery").forEach((gallery) => {
+    const track = gallery.querySelector(".gallery-track");
+    const slides = gallery.querySelectorAll(".gallery-item");
+    const prevBtn = gallery.querySelector(".gallery-prev");
+    const nextBtn = gallery.querySelector(".gallery-next");
+    const dots = gallery.querySelectorAll(".gallery-dots span");
+
+    let index = 0;
+    const total = slides.length;
+
+    function update() {
+      track.style.transform = `translateX(-${index * 100}%)`;
+
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === index);
+      });
+    }
+
+    nextBtn?.addEventListener("click", () => {
+      index = (index + 1) % total;
+      update();
+    });
+
+    prevBtn?.addEventListener("click", () => {
+      index = (index - 1 + total) % total;
+      update();
+    });
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener("click", () => {
+        index = i;
+        update();
+      });
+    });
   });
 });
 
 /* ==========================================================
-   CSRF Cookie Helper (REQUIRED)
-   ========================================================== */
+   CSRF Helper
+========================================================== */
 function getCookie(name) {
-  let cookieValue = null;
+  let value = null;
   document.cookie.split(";").forEach((cookie) => {
     cookie = cookie.trim();
     if (cookie.startsWith(name + "=")) {
-      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+      value = decodeURIComponent(cookie.slice(name.length + 1));
     }
   });
-  return cookieValue;
+  return value;
 }

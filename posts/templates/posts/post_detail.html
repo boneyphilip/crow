@@ -13,17 +13,16 @@
   <body>
     {% include 'posts/navbar.html' %}
 
-    <!-- ✔ SAME WRAPPER AS HOME PAGE -->
+    <!-- MAIN WRAPPER -->
     <div class="feed-wrapper">
-      <!-- MAIN POST CARD -->
+      <!-- POST CARD -->
       <div class="post-card">
         <!-- HEADER -->
         <div class="post-header">
           <img
-            src="https://ui-avatars.com/api/?name={{ post.author.username }}"
             class="post-avatar"
+            src="https://ui-avatars.com/api/?name={{ post.author.username }}"
           />
-
           <div class="post-meta">
             <span class="post-author">{{ post.author.username }}</span>
             <span class="post-time"
@@ -42,34 +41,73 @@
         <!-- CONTENT -->
         <p class="post-content">{{ post.content }}</p>
 
-        <!-- MEDIA -->
+        <!-- =====================================================
+             MEDIA SECTION — SAME STRUCTURE AS HOME FEED
+        ====================================================== -->
         {% if post.media.count == 1 %} {% with m=post.media.first %}
         <div class="media-single">
           {% if m.is_image %}
           <img src="{{ m.file.url }}" class="media-single-img" />
+
           {% elif m.is_video %}
           <video controls class="media-single-video">
             <source src="{{ m.file.url }}" type="video/mp4" />
           </video>
+
+          {% else %}
+          <!-- SINGLE DOC PREVIEW -->
+          <a href="{{ m.file.url }}" target="_blank" class="doc-preview-card">
+            <div class="doc-icon">📄</div>
+            <div class="doc-info">
+              <span class="doc-name">{{ m.file.name|truncatechars:32 }}</span>
+              <span class="doc-meta">Click to view / download</span>
+            </div>
+          </a>
           {% endif %}
         </div>
-        {% endwith %} {% else %}
-        <div class="media-grid">
-          {% for media in post.media.all %}
-          <div class="media-item">
-            {% if media.is_image %}
-            <img src="{{ media.file.url }}" />
-            {% elif media.is_video %}
-            <video muted>
-              <source src="{{ media.file.url }}" type="video/mp4" />
-            </video>
-            {% endif %}
+        {% endwith %} {% elif post.media.count > 1 %}
+
+        <!-- MULTI-MEDIA REDDIT-STYLE SLIDER -->
+        <div class="media-gallery" id="gallery-detail-{{ post.id }}">
+          <div class="gallery-track">
+            {% for media in post.media.all %}
+            <div class="gallery-item">
+              {% if media.is_image %}
+              <img src="{{ media.file.url }}" />
+
+              {% elif media.is_video %}
+              <video controls muted>
+                <source src="{{ media.file.url }}" type="video/mp4" />
+              </video>
+
+              {% else %}
+              <!-- DOC INSIDE SLIDER -->
+              <a href="{{ media.file.url }}" target="_blank" class="doc-slide">
+                <div class="doc-big-icon">📄</div>
+                <div class="doc-name">
+                  {{ media.file.name|truncatechars:24 }}
+                </div>
+              </a>
+              {% endif %}
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
+
+          <!-- NAVIGATION -->
+          <button class="gallery-prev">‹</button>
+          <button class="gallery-next">›</button>
+
+          <!-- DOTS -->
+          <div class="gallery-dots">
+            {% for media in post.media.all %}
+            <span class="{% if forloop.first %}active{% endif %}"></span>
+            {% endfor %}
+          </div>
         </div>
+
         {% endif %}
 
-        <!-- ACTION BAR (Home page style) -->
+        <!-- ACTION BAR -->
         <div class="post-actions">
           <div class="vote-box">
             {% if user.is_authenticated %}
@@ -84,7 +122,9 @@
             <span class="disabled-vote">▲</span>
             {% endif %}
 
-            <span class="vote-count">{{ post.upvotes }}</span>
+            <span class="vote-count" id="detail-vote-count"
+              >{{ post.upvotes }}</span
+            >
 
             {% if user.is_authenticated %}
             <button
@@ -106,11 +146,13 @@
           <div class="action-btn">↗ Share</div>
         </div>
       </div>
-      <!-- end .post-card -->
+      <!-- END POST CARD -->
     </div>
-    <!-- end .feed-wrapper -->
+    <!-- END WRAPPER -->
 
-    <!-- ✔ COMMENT SECTION ALSO INSIDE FEED WRAPPER -->
+    <!-- =====================================================
+     COMMENT SECTION
+====================================================== -->
     <div class="feed-wrapper" id="comments">
       <div class="comments-section">
         <h3 class="section-title">Comments • {{ post.comments.count }}</h3>
@@ -152,9 +194,7 @@
 
           <div class="comment-actions">
             {% if user.is_authenticated %}
-            <span class="reply-btn" onclick="toggleReply({{ comment.id }})"
-              >Reply</span
-            >
+            <span class="reply-toggle" data-id="{{ comment.id }}">Reply</span>
             {% endif %} {% if user == comment.author %}
             <a href="{% url 'edit_comment' comment.id %}" class="edit-btn"
               >Edit</a
@@ -170,8 +210,8 @@
           <div class="reply-card">
             <div class="reply-header">
               <img
-                src="https://ui-avatars.com/api/?name={{ reply.author.username }}"
                 class="reply-avatar"
+                src="https://ui-avatars.com/api/?name={{ reply.author.username }}"
               />
               <div>
                 <span class="reply-author">{{ reply.author.username }}</span>
@@ -199,10 +239,11 @@
           <!-- REPLY FORM -->
           {% if user.is_authenticated %}
           <form
+            id="reply-form-{{ comment.id }}"
             method="POST"
             action="{% url 'reply_comment' comment.id %}"
-            id="reply-box-{{ comment.id }}"
-            class="reply-form hidden"
+            class="reply-form"
+            style="display: none"
           >
             {% csrf_token %}
             <textarea
@@ -210,6 +251,7 @@
               class="reply-input"
               placeholder="Reply..."
             ></textarea>
+
             <button class="reply-submit">Reply</button>
           </form>
           {% endif %}
@@ -218,10 +260,6 @@
       </div>
     </div>
 
-    <script>
-      function toggleReply(id) {
-        document.getElementById("reply-box-" + id).classList.toggle("hidden");
-      }
-    </script>
+    <script src="{% static 'posts/js/post_detail.js' %}"></script>
   </body>
 </html>
