@@ -61,7 +61,12 @@
 
           {% else %}
           <!-- SINGLE DOCUMENT CARD -->
-          <a href="{{ m.file.url }}" target="_blank" class="doc-preview-card">
+          <div
+  class="doc-preview-card"
+  data-src="{{ m.file.url }}"
+  data-name="{{ m.file.name|truncatechars:32 }}"
+>
+
             <div class="doc-icon">📄</div>
             <div class="doc-info">
               <span class="doc-name">{{ m.file.name|truncatechars:32 }}</span>
@@ -89,19 +94,18 @@
               <video controls muted>
                 <source src="{{ media.file.url }}" type="video/mp4" />
               </video>
-
               {% else %}
-              <!-- DOC IN GALLERY -->
-              <a
-                href="{{ media.file.url }}"
-                target="_blank"
-                class="doc-slide-card"
+              <div
+                class="doc-slide"
+                data-src="{{ media.file.url }}"
+                data-name="{{ media.file.name|truncatechars:26 }}"
               >
                 <div class="doc-big-icon">📄</div>
                 <div class="doc-name">
                   {{ media.file.name|truncatechars:26 }}
                 </div>
-              </a>
+                <div class="doc-open">Open / Download</div>
+              </div>
               {% endif %}
             </div>
             {% endfor %}
@@ -181,6 +185,20 @@
       <div class="lightbox-content">
         <img id="lightbox-img" class="hidden" />
         <video id="lightbox-video" controls class="hidden"></video>
+        <div id="lightbox-doc" class="hidden doc-lightbox-box">
+          <div class="doc-preview">
+            <div class="doc-big-icon">📄</div>
+            <div id="doc-name" class="doc-title"></div>
+            <a
+              id="doc-download"
+              href="#"
+              target="_blank"
+              class="doc-download-btn"
+            >
+              Open / Download
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 

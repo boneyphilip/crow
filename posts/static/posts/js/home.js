@@ -1,17 +1,32 @@
 /* ==========================================================
-   HOME PAGE — AJAX Voting + Reddit-Style Media Slider
+   HOME PAGE — Voting + Gallery + Unified Lightbox
+   FINAL, STABLE & SUBMISSION-READY
 ========================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("[HOME] Voting + Gallery JS Loaded");
+  console.log("[HOME] Loaded");
 
   /* ==========================================================
-     VOTING LOGIC
+     CSRF HELPER
+  ========================================================== */
+  function getCookie(name) {
+    let value = null;
+    document.cookie.split(";").forEach((c) => {
+      c = c.trim();
+      if (c.startsWith(name + "=")) {
+        value = c.substring(name.length + 1);
+      }
+    });
+    return value;
+  }
+
+  /* ==========================================================
+     VOTING SYSTEM (AJAX)
   ========================================================== */
   document.body.addEventListener("click", (e) => {
-    if (!e.target.classList.contains("vote-btn")) return;
+    const btn = e.target.closest(".vote-btn");
+    if (!btn) return;
 
-    const btn = e.target;
     const postId = btn.dataset.postId;
     const action = btn.dataset.action;
 
@@ -25,195 +40,187 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (!data.success) return;
-        const countEl = document.getElementById(`vote-count-${postId}`);
-        if (countEl) countEl.textContent = data.upvotes;
+        if (data.success) {
+          const count = document.getElementById(`vote-count-${postId}`);
+          if (count) count.textContent = data.upvotes;
+        }
       })
-      .catch((err) => console.error(err));
+      .catch(() => console.warn("Vote request failed"));
   });
 
   /* ==========================================================
-     REDDIT STYLE SLIDER (Images + Videos + Documents)
+     REDDIT-STYLE GALLERY SLIDER (INLINE VIEW)
   ========================================================== */
   document.querySelectorAll(".media-gallery").forEach((gallery) => {
     const track = gallery.querySelector(".gallery-track");
     const slides = gallery.querySelectorAll(".gallery-item");
     const dots = gallery.querySelectorAll(".gallery-dots span");
+    const prev = gallery.querySelector(".gallery-prev");
+    const next = gallery.querySelector(".gallery-next");
 
-    const prevBtn = gallery.querySelector(".gallery-prev");
-    const nextBtn = gallery.querySelector(".gallery-next");
+    let index = 0;
+    const total = slides.length;
 
-    let currentIndex = 0;
-    const totalSlides = slides.length;
-    let sliding = false;
-
-    /* Disable arrows if only 1 slide */
-    if (totalSlides <= 1) {
-      prevBtn.style.display = "none";
-      nextBtn.style.display = "none";
-      dots.forEach((d) => (d.style.display = "none"));
-      return;
+    function update() {
+      track.style.transform = `translateX(-${index * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle("active", i === index));
     }
 
-    /* Update slider UI */
-    function updateSlider() {
-      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    next?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      index = (index + 1) % total;
+      update();
+    });
 
-      dots.forEach((dot, i) =>
-        dot.classList.toggle("active", i === currentIndex)
-      );
-    }
+    prev?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      index = (index - 1 + total) % total;
+      update();
+    });
 
-    /* Prevent spam-clicking */
-    function safeSlide(callback) {
-      if (sliding) return;
-      sliding = true;
-      callback();
-      setTimeout(() => (sliding = false), 300);
-    }
-
-    /* Next */
-    nextBtn.addEventListener("click", () => {
-      safeSlide(() => {
-        currentIndex = (currentIndex + 1) % totalSlides;
-        updateSlider();
+    dots.forEach((dot, i) => {
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        index = i;
+        update();
       });
     });
 
-    /* Previous */
-    prevBtn.addEventListener("click", () => {
-      safeSlide(() => {
-        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-        updateSlider();
-      });
-    });
-
-    /* Dot navigation */
-    dots.forEach((dot, i) =>
-      dot.addEventListener("click", () => {
-        currentIndex = i;
-        updateSlider();
-      })
-    );
-
-    /* ==========================================================
-       SWIPE SUPPORT (Mobile friendly)
-    ========================================================== */
-    let startX = 0;
-    let isDragging = false;
-
-    gallery.addEventListener("touchstart", (e) => {
-      startX = e.touches[0].clientX;
-      isDragging = true;
-    });
-
-    gallery.addEventListener("touchmove", (e) => {
-      if (!isDragging) return;
-
-      const diff = e.touches[0].clientX - startX;
-
-      if (Math.abs(diff) > 60) {
-        isDragging = false;
-        if (diff < 0) nextBtn.click();
-        else prevBtn.click();
-      }
-    });
-
-    gallery.addEventListener("touchend", () => {
-      isDragging = false;
-    });
-
-    /* Call once on load */
-    updateSlider();
+    update();
   });
-});
 
-/* ==========================================================
-   CSRF Helper
-========================================================== */
-function getCookie(name) {
-  let value = null;
-  document.cookie.split(";").forEach((cookie) => {
-    cookie = cookie.trim();
-    if (cookie.startsWith(name + "=")) {
-      value = decodeURIComponent(cookie.slice(name.length + 1));
-    }
-  });
-  return value;
-}
-
-/* ==========================================================
-   LIGHTBOX — Only load media from clicked post 
-========================================================== */
-
-document.addEventListener("DOMContentLoaded", () => {
+  /* ==========================================================
+     LIGHTBOX ELEMENTS
+  ========================================================== */
   const lightbox = document.getElementById("lightbox");
   const imgBox = document.getElementById("lightbox-img");
   const vidBox = document.getElementById("lightbox-video");
+  const docBox = document.getElementById("lightbox-doc");
+  const docName = document.getElementById("doc-name");
+  const docDownload = document.getElementById("doc-download");
   const closeBtn = document.getElementById("lightbox-close");
   const prevBtn = document.getElementById("lightbox-prev");
   const nextBtn = document.getElementById("lightbox-next");
 
   let mediaList = [];
-  let index = 0;
+  let currentIndex = 0;
 
-  function openLightbox(i) {
-    index = i;
-    const item = mediaList[index];
-
+  /* ==========================================================
+     LIGHTBOX HELPERS
+  ========================================================== */
+  function resetLightbox() {
     imgBox.classList.remove("active");
     vidBox.classList.remove("active");
+    docBox.classList.add("hidden");
+
+    imgBox.src = "";
+    vidBox.pause();
+    vidBox.src = "";
+  }
+
+  function openLightbox(index) {
+    if (!mediaList.length) return;
+
+    currentIndex = index;
+    const item = mediaList[currentIndex];
+    resetLightbox();
 
     if (item.type === "image") {
       imgBox.src = item.src;
       imgBox.classList.add("active");
-    } else {
+    }
+
+    if (item.type === "video") {
       vidBox.src = item.src;
       vidBox.classList.add("active");
+      vidBox.load();
+    }
+
+    if (item.type === "doc") {
+      docName.textContent = item.name || "Document";
+      docDownload.href = item.src;
+      docBox.classList.remove("hidden");
     }
 
     lightbox.classList.remove("hidden");
   }
 
   function closeLightbox() {
+    resetLightbox();
     lightbox.classList.add("hidden");
-    vidBox.pause();
+    mediaList = [];
+    currentIndex = 0;
   }
 
-  function next() {
-    index = (index + 1) % mediaList.length;
-    openLightbox(index);
+  function showNext() {
+    openLightbox((currentIndex + 1) % mediaList.length);
   }
 
-  function prev() {
-    index = (index - 1 + mediaList.length) % mediaList.length;
-    openLightbox(index);
+  function showPrev() {
+    openLightbox((currentIndex - 1 + mediaList.length) % mediaList.length);
   }
 
-  closeBtn.addEventListener("click", closeLightbox);
-  nextBtn.addEventListener("click", next);
-  prevBtn.addEventListener("click", prev);
+  /* ==========================================================
+     LIGHTBOX CONTROLS
+  ========================================================== */
+  closeBtn?.addEventListener("click", closeLightbox);
+  nextBtn?.addEventListener("click", showNext);
+  prevBtn?.addEventListener("click", showPrev);
 
-  /* -------------------------------
-     CLICK HANDLING
-  -------------------------------- */
-  document.querySelectorAll(".media-gallery").forEach((gallery) => {
-    const postId = gallery.dataset.postId;
+  // Close when clicking outside content
+  lightbox?.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
 
-    const mediaElements = gallery.querySelectorAll("img, video");
+  // Keyboard controls
+  document.addEventListener("keydown", (e) => {
+    if (lightbox.classList.contains("hidden")) return;
 
-    gallery.querySelectorAll("img, video").forEach((el, i) => {
-      el.style.cursor = "pointer";
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") showNext();
+    if (e.key === "ArrowLeft") showPrev();
+  });
 
-      el.addEventListener("click", () => {
-        // Rebuild correct mediaList only for this post
-        mediaList = Array.from(mediaElements).map((m) => ({
-          src: m.tagName === "IMG" ? m.src : m.querySelector("source").src,
-          type: m.tagName === "IMG" ? "image" : "video",
-        }));
+  /* ==========================================================
+     MEDIA CLICK HANDLER (EVENT DELEGATION)
+     - Single image / video / document
+     - Gallery image / video / document
+     - Scoped to the clicked post only
+  ========================================================== */
+  document.addEventListener("click", (e) => {
+    const mediaEl = e.target.closest(
+      ".media-single-img, .media-single-video, .doc-preview-card, .gallery-item img, .gallery-item video, .doc-slide"
+    );
+    if (!mediaEl) return;
 
-        openLightbox(i);
-      });
+    e.preventDefault();
+    e.stopPropagation();
+
+    const postCard = mediaEl.closest(".post-card");
+    if (!postCard) return;
+
+    const elements = postCard.querySelectorAll(
+      ".media-single-img, .media-single-video, .doc-preview-card, .gallery-item img, .gallery-item video, .doc-slide"
+    );
+
+    mediaList = Array.from(elements).map((el) => {
+      if (el.tagName === "IMG") {
+        return { type: "image", src: el.src };
+      }
+      if (el.tagName === "VIDEO") {
+        return {
+          type: "video",
+          src: el.querySelector("source").src,
+        };
+      }
+      return {
+        type: "doc",
+        src: el.dataset.src,
+        name: el.dataset.name,
+      };
     });
+
+    const index = Array.from(elements).indexOf(mediaEl);
+    openLightbox(index);
   });
 });
