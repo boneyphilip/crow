@@ -62,14 +62,18 @@
           {% else %}
           <!-- SINGLE DOCUMENT CARD -->
           <div
-            class="doc-preview-card"
+            class="doc-attachment"
             data-src="{{ m.file.url }}"
-            data-name="{{ m.file.name|truncatechars:32 }}"
+            data-name="{{ m.file.name }}"
           >
-            <div class="doc-icon">📄</div>
-            <div class="doc-info">
-              <span class="doc-name">{{ m.file.name|truncatechars:32 }}</span>
-              <span class="doc-meta">Click to view / download</span>
+            <div class="doc-attachment-inner">
+              <div class="doc-file-icon">📄</div>
+              <div class="doc-file-info">
+                <div class="doc-file-name">
+                  {{ m.file.name|truncatechars:45 }}
+                </div>
+                <div class="doc-file-meta">Click to view / download</div>
+              </div>
             </div>
           </div>
 
