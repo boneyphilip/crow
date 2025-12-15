@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 import json
 
-from .models import Post, PostMedia, Comment, Category
+from .models import Post, PostMedia, Comment, Category, Vote
 from .forms import PostForm
 
 
@@ -373,4 +373,37 @@ def category_search(request):
 
     return JsonResponse({
         "results": [c.name for c in categories]
+    })
+
+# -----------------------------
+# Vote Model (One vote per user per post)
+# -----------------------------
+
+
+@login_required
+def vote_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    data = json.loads(request.body)
+    action = data.get("action")
+
+    value = 1 if action == "upvote" else -1
+
+    vote, created = Vote.objects.get_or_create(
+        user=request.user,
+        post=post,
+        defaults={"value": value},
+    )
+
+    if not created:
+        if vote.value == value:
+            # Same vote clicked again → remove vote
+            vote.delete()
+        else:
+            # Switch upvote ↔ downvote
+            vote.value = value
+            vote.save()
+
+    return JsonResponse({
+        "success": True,
+        "score": post.get_score(),
     })

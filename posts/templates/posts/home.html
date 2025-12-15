@@ -151,9 +151,9 @@
             <span class="disabled-vote">▲</span>
             {% endif %}
 
-            <span class="vote-count" id="vote-count-{{ post.id }}"
-              >{{ post.upvotes }}</span
-            >
+            <span class="vote-count" id="vote-count-{{ post.id }}">
+              {{ post.get_score }}
+            </span>
 
             {% if user.is_authenticated %}
             <button

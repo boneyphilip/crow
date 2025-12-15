@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         if (data.success) {
           const count = document.getElementById(`vote-count-${postId}`);
-          if (count) count.textContent = data.upvotes;
+          if (count) count.textContent = data.score;
         }
       })
       .catch(() => console.warn("Vote request failed"));
