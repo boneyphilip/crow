@@ -13,7 +13,7 @@ class CategoryAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
     def post_count(self, obj):
-        return obj.post_set.count()
+        return obj.posts.count()
 
     post_count.short_description = 'Number of Posts'
 

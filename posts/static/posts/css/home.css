@@ -119,7 +119,7 @@ body {
 }
 
 /* Normalize document-only post height */
-.media-single .doc-preview-card {
+.media-single .doc-attachment {
   width: 100%;
   box-sizing: border-box;
 }
@@ -299,16 +299,30 @@ body {
   height: 26px;
   border: none;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .vote-btn:hover {
   background: #ccc;
 }
 
+/* Vote UI state */
+.vote-btn.active {
+  color: #fff;
+}
+
+.vote-btn.upvote.active {
+  background: #2ecc71; /* green */
+}
+
+.vote-btn.downvote.active {
+  background: #e74c3c; /* red */
+}
+
 /* ============================================================
    DOCUMENT PREVIEW (INLINE)
 ============================================================ */
-.doc-preview-card {
+.doc-attachment {
   display: flex;
   align-items: center;
   gap: 12px;

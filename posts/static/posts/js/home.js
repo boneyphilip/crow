@@ -43,6 +43,36 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.success) {
           const count = document.getElementById(`vote-count-${postId}`);
           if (count) count.textContent = data.score;
+
+          // Find buttons inside the same post card
+          const postCard = btn.closest(".post-card");
+          if (!postCard) return;
+
+          const upBtn = postCard.querySelector(".vote-btn.upvote");
+          const downBtn = postCard.querySelector(".vote-btn.downvote");
+
+          if (!upBtn || !downBtn) return;
+
+          // Reset UI state
+          upBtn.classList.remove("active");
+          downBtn.classList.remove("active");
+
+          // Toggle logic based on clicked button
+          if (action === "upvote") {
+            if (btn.classList.contains("active")) {
+              // vote was removed → keep both inactive
+            } else {
+              upBtn.classList.add("active");
+            }
+          }
+
+          if (action === "downvote") {
+            if (btn.classList.contains("active")) {
+              // vote was removed → keep both inactive
+            } else {
+              downBtn.classList.add("active");
+            }
+          }
         }
       })
       .catch(() => console.warn("Vote request failed"));
@@ -189,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ========================================================== */
   document.addEventListener("click", (e) => {
     const mediaEl = e.target.closest(
-      ".media-single-img, .media-single-video, .doc-preview-card, .gallery-item img, .gallery-item video, .doc-slide"
+      ".media-single-img, .media-single-video, .doc-attachment, .gallery-item img, .gallery-item video, .doc-slide"
     );
     if (!mediaEl) return;
 
@@ -200,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!postCard) return;
 
     const elements = postCard.querySelectorAll(
-      ".media-single-img, .media-single-video, .doc-preview-card, .gallery-item img, .gallery-item video, .doc-slide"
+      ".media-single-img, .media-single-video, .doc-attachment, .gallery-item img, .gallery-item video, .doc-slide"
     );
 
     mediaList = Array.from(elements).map((el) => {
