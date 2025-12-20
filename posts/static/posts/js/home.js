@@ -253,4 +253,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const index = Array.from(elements).indexOf(mediaEl);
     openLightbox(index);
   });
+
+  /* ==========================================================
+   SHARE BUTTON (COPY LINK / NATIVE SHARE)
+========================================================== */
+  document.body.addEventListener("click", async (e) => {
+    const shareBtn = e.target.closest(".share-btn");
+    if (!shareBtn) return;
+
+    const postCard = shareBtn.closest(".post-card");
+    if (!postCard) return;
+
+    const postId = postCard.dataset.postId;
+    const postUrl = `${window.location.origin}/post/${postId}/`;
+
+    try {
+      // Mobile / supported browsers
+      if (navigator.share) {
+        await navigator.share({
+          title: "Check this post on Crow",
+          url: postUrl,
+        });
+      } else {
+        // Desktop fallback
+        await navigator.clipboard.writeText(postUrl);
+        alert("Link copied to clipboard!");
+      }
+    } catch (err) {
+      console.warn("Share cancelled or failed", err);
+    }
+  });
 });

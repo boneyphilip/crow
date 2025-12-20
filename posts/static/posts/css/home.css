@@ -280,6 +280,26 @@ body {
 /* ============================================================
    ACTION BAR & VOTING
 ============================================================ */
+
+/* Action buttons (Comments + Share) */
+.action-btn {
+  font-size: 14px;
+  color: #333;
+  cursor: pointer; /* 👈 IMPORTANT */
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.action-btn:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+/* Share button extra hint */
+.share-btn {
+  cursor: pointer; /* double safety */
+}
+
 .post-actions {
   display: flex;
   justify-content: space-between;
