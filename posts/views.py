@@ -122,8 +122,21 @@ def vote_post(request, post_id):
         return JsonResponse({"success": False}, status=405)
 
     post = get_object_or_404(Post, id=post_id)
-    data = json.loads(request.body)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"success": False, "error": "Invalid JSON"},
+            status=400,
+        )
+
     action = data.get("action")
+    if action not in ("upvote", "downvote"):
+        return JsonResponse(
+            {"success": False, "error": "Invalid action"},
+            status=400,
+        )
 
     value = 1 if action == "upvote" else -1
 
@@ -135,15 +148,16 @@ def vote_post(request, post_id):
 
     if not created:
         if vote.value == value:
-            vote.delete()
+            vote.delete()  # Same vote clicked again => remove
         else:
-            vote.value = value
+            vote.value = value  # Switch upvote <-> downvote
             vote.save()
 
     return JsonResponse(
         {
             "success": True,
             "score": post.get_score(),
+            "user_vote": post.user_vote(request.user),  # ✅ important for UI
         }
     )
 

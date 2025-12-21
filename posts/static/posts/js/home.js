@@ -57,21 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
           upBtn.classList.remove("active");
           downBtn.classList.remove("active");
 
-          // Toggle logic based on clicked button
-          if (action === "upvote") {
-            if (btn.classList.contains("active")) {
-              // vote was removed → keep both inactive
-            } else {
-              upBtn.classList.add("active");
-            }
-          }
-
-          if (action === "downvote") {
-            if (btn.classList.contains("active")) {
-              // vote was removed → keep both inactive
-            } else {
-              downBtn.classList.add("active");
-            }
+          // Apply correct active state from server response
+          // data.user_vote: 1 = upvote, -1 = downvote, 0 = no vote
+          if (data.user_vote === 1) {
+            upBtn.classList.add("active");
+          } else if (data.user_vote === -1) {
+            downBtn.classList.add("active");
           }
         }
       })
