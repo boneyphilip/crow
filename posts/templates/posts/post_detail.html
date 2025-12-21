@@ -16,7 +16,7 @@
     <!-- MAIN WRAPPER -->
     <div class="feed-wrapper">
       <!-- POST CARD -->
-      <div class="post-card">
+      <div class="post-card" data-post-id="{{ post.id }}">
         <!-- HEADER -->
         <div class="post-header">
           <img
@@ -112,7 +112,8 @@
           <div class="vote-box">
             {% if user.is_authenticated %}
             <button
-              class="vote-btn"
+              type="button"
+              class="vote-btn upvote {% if post.user_vote_value == 1 %}active{% endif %}"
               data-post-id="{{ post.id }}"
               data-action="upvote"
             >
@@ -122,13 +123,14 @@
             <span class="disabled-vote">▲</span>
             {% endif %}
 
-            <span class="vote-count" id="detail-vote-count"
-              >{{ post.get_score }}</span
-            >
+            <span class="vote-count" id="vote-count-{{ post.id }}">
+              {{ post.get_score }}
+            </span>
 
             {% if user.is_authenticated %}
             <button
-              class="vote-btn"
+              type="button"
+              class="vote-btn downvote {% if post.user_vote_value == -1 %}active{% endif %}"
               data-post-id="{{ post.id }}"
               data-action="downvote"
             >
@@ -143,7 +145,7 @@
             💬 {{ post.comments.count }} Comments
           </a>
 
-          <div class="action-btn">↗ Share</div>
+          <div class="action-btn share-btn">↗ Share</div>
         </div>
       </div>
       <!-- END POST CARD -->

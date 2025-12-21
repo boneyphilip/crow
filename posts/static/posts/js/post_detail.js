@@ -18,13 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ==========================================================
-     POST DETAIL — AJAX Voting
-  ========================================================== */
-
+   POST DETAIL — AJAX Voting (same response as home)
+========================================================== */
   document.body.addEventListener("click", (e) => {
-    if (!e.target.classList.contains("vote-btn")) return;
+    const btn = e.target.closest(".vote-btn");
+    if (!btn) return;
 
-    const btn = e.target;
     const postId = btn.dataset.postId;
     const action = btn.dataset.action;
 
@@ -40,10 +39,24 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         if (!data.success) return;
 
+        // Update score (prevents blank issue)
         const countEl = document.getElementById(`vote-count-${postId}`);
-        if (countEl) countEl.textContent = data.upvotes;
+        if (countEl && data.score !== undefined && data.score !== null) {
+          countEl.textContent = data.score;
+        }
+
+        // Update active state
+        const postCard = btn.closest(".post-card") || document;
+        const upBtn = postCard.querySelector(".vote-btn.upvote");
+        const downBtn = postCard.querySelector(".vote-btn.downvote");
+
+        if (upBtn) upBtn.classList.remove("active");
+        if (downBtn) downBtn.classList.remove("active");
+
+        if (data.user_vote === 1 && upBtn) upBtn.classList.add("active");
+        if (data.user_vote === -1 && downBtn) downBtn.classList.add("active");
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Vote error:", err));
   });
 
   /* ==========================================================
@@ -176,4 +189,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
       el.addEventListener("click", () => openLightbox(i));
     });
+});
+
+/* ==========================================================
+   SHARE BUTTON (COPY LINK / NATIVE SHARE)
+========================================================== */
+document.body.addEventListener("click", async (e) => {
+  const shareBtn = e.target.closest(".share-btn");
+  if (!shareBtn) return;
+
+  const postCard = shareBtn.closest(".post-card");
+  if (!postCard) return;
+
+  const postId = postCard.dataset.postId;
+  const postUrl = `${window.location.origin}/post/${postId}/`;
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: "Crow Post", url: postUrl });
+      return;
+    }
+
+    // Clipboard fallback (works on localhost usually)
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(postUrl);
+      alert("Link copied to clipboard!");
+      return;
+    }
+
+    // Old fallback
+    const temp = document.createElement("textarea");
+    temp.value = postUrl;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    document.body.removeChild(temp);
+    alert("Link copied to clipboard!");
+  } catch (err) {
+    console.warn("Share failed:", err);
+  }
 });

@@ -118,24 +118,29 @@ def post_detail(request, post_id):
 # ==================================================
 @login_required
 def vote_post(request, post_id):
+    """Handle Reddit-style voting: toggle / switch vote and return
+    updated score."""
     if request.method != "POST":
-        return JsonResponse({"success": False}, status=405)
+        return JsonResponse(
+            {"success": False, "error": "Invalid method"},
+            status=405
+        )
 
     post = get_object_or_404(Post, id=post_id)
 
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode("utf-8"))
     except json.JSONDecodeError:
         return JsonResponse(
-            {"success": False, "error": "Invalid JSON"},
-            status=400,
+            {"success": False, "error": "Bad JSON"},
+            status=400
         )
 
     action = data.get("action")
     if action not in ("upvote", "downvote"):
         return JsonResponse(
             {"success": False, "error": "Invalid action"},
-            status=400,
+            status=400
         )
 
     value = 1 if action == "upvote" else -1
@@ -148,16 +153,16 @@ def vote_post(request, post_id):
 
     if not created:
         if vote.value == value:
-            vote.delete()  # Same vote clicked again => remove
+            vote.delete()  # same vote again => remove
         else:
-            vote.value = value  # Switch upvote <-> downvote
+            vote.value = value  # switch vote
             vote.save()
 
     return JsonResponse(
         {
             "success": True,
             "score": post.get_score(),
-            "user_vote": post.user_vote(request.user),  # ✅ important for UI
+            "user_vote": post.user_vote(request.user),  # 1, -1, 0
         }
     )
 

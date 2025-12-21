@@ -245,6 +245,23 @@ body {
   text-decoration: underline;
 }
 
+/* Vote UI state (same as home) */
+.vote-btn.active {
+  color: #fff;
+}
+
+.vote-btn.upvote.active {
+  background: #2ecc71;
+}
+
+.vote-btn.downvote.active {
+  background: #e74c3c;
+}
+
+/* Share pointer (UX) */
+.share-btn {
+  cursor: pointer;
+}
 /* ---------------------------------------------------------
    COMMENTS SECTION
 ---------------------------------------------------------- */
