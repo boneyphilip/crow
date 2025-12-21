@@ -393,6 +393,47 @@ body {
   display: block;
 }
 
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  color: #fff;
+  font-size: 40px;
+  cursor: pointer;
+  z-index: 100001;
+  user-select: none;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: #fff;
+  font-size: 40px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#lightbox-prev {
+  left: 18px;
+}
+
+#lightbox-next {
+  right: 18px;
+}
+
+.lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
 /* ============================================================
    LIGHTBOX DOCUMENT
 ============================================================ */
