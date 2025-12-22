@@ -205,34 +205,42 @@
     </div>
 
     <!-- ==================================================
-         LIGHTBOX (FULL FEATURED)
-    ================================================== -->
+     LIGHTBOX (FULL FEATURED – IMAGE / VIDEO / DOCUMENT)
+================================================== -->
     <div id="lightbox" class="lightbox hidden">
       <!-- CLOSE -->
       <span id="lightbox-close" class="lightbox-close">×</span>
 
-      <!-- NAV -->
+      <!-- NAVIGATION -->
       <button id="lightbox-prev" class="lightbox-nav">‹</button>
       <button id="lightbox-next" class="lightbox-nav">›</button>
 
       <!-- CONTENT -->
       <div class="lightbox-content">
         <!-- IMAGE -->
-        <img id="lightbox-img" alt="Lightbox image" />
+        <img id="lightbox-img" alt="Lightbox image" class="" />
 
         <!-- VIDEO -->
-        <video id="lightbox-video" controls></video>
+        <video id="lightbox-video" controls preload="metadata">
+          <source />
+        </video>
 
         <!-- DOCUMENT -->
         <div id="lightbox-doc" class="doc-lightbox-box hidden">
           <div class="doc-preview">
+            <!-- BIG DOCUMENT ICON -->
             <div class="doc-big-icon">📄</div>
+
+            <!-- DOCUMENT NAME -->
             <div id="doc-name" class="doc-title"></div>
+
+            <!-- DOWNLOAD / OPEN -->
             <a
               id="doc-download"
               class="doc-download-btn"
               href="#"
               target="_blank"
+              rel="noopener"
             >
               Open / Download
             </a>
