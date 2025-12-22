@@ -6,7 +6,7 @@
     <meta charset="UTF-8" />
     <title>Crow — Home Feed</title>
 
-    <!-- NAVBAR + HOME STYLES -->
+    <!-- STYLES -->
     <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
     <link rel="stylesheet" href="{% static 'posts/css/home.css' %}" />
 
@@ -21,7 +21,7 @@
     <!-- NAVBAR -->
     {% include "posts/navbar.html" %}
 
-    <!-- ================= FEED WRAPPER ================= -->
+    <!-- ================= FEED ================= -->
     <div class="feed-wrapper">
       <!-- FLASH MESSAGES -->
       {% if messages %} {% for message in messages %}
@@ -31,7 +31,7 @@
       <!-- ================= POSTS LOOP ================= -->
       {% for post in posts %}
       <div class="post-card" data-post-id="{{ post.id }}">
-        <!-- ---------- POST HEADER ---------- -->
+        <!-- HEADER -->
         <div class="post-header">
           <img
             class="post-avatar"
@@ -51,21 +51,20 @@
           </div>
         </div>
 
-        <!-- ---------- TITLE ---------- -->
+        <!-- TITLE -->
         <h2 class="post-title">{{ post.title }}</h2>
 
-        <!-- ---------- CONTENT ---------- -->
+        <!-- CONTENT -->
         <p class="post-content">{{ post.content|truncatechars:250 }}</p>
 
         <!-- ==================================================
-             MEDIA HANDLING (SINGLE / MULTI)
-        ================================================== -->
+           MEDIA HANDLING (CLOUDINARY SAFE)
+      ================================================== -->
         {% with media_list=post.media.all %}
 
         <!-- ===== SINGLE MEDIA ===== -->
         {% if media_list|length == 1 %} {% with m=media_list.0 %}
         <div class="media-single">
-          <!-- IMAGE -->
           {% if m.file.resource_type == "image" %}
           <img
             src="{{ m.file.url }}"
@@ -73,40 +72,39 @@
             alt="Post image"
           />
 
-          <!-- VIDEO -->
           {% elif m.file.resource_type == "video" %}
-          <video controls class="media-single-video">
+          <video
+            class="media-single-video js-media"
+            controls
+            preload="metadata"
+          >
             <source src="{{ m.file.url }}" />
           </video>
 
-          <!-- DOCUMENT -->
           {% else %}
           <div
             class="doc-attachment"
             data-src="{{ m.file.url }}"
-            data-name="{{ m.file.public_id|truncatechars:45 }}"
+            data-name="{{ m.file.public_id }}"
           >
-            <div class="doc-attachment-inner">
-              <div class="doc-file-icon">📄</div>
-              <div class="doc-file-info">
-                <div class="doc-file-name">
-                  {{ m.file.public_id|truncatechars:45 }}
-                </div>
-                <div class="doc-file-meta">Click to view / download</div>
+            <div class="doc-file-icon">📄</div>
+            <div class="doc-file-info">
+              <div class="doc-file-name">
+                {{ m.file.public_id|truncatechars:45 }}
               </div>
+              <div class="doc-file-meta">Click to open / download</div>
             </div>
           </div>
           {% endif %}
         </div>
         {% endwith %}
 
-        <!-- ===== MULTI MEDIA GALLERY ===== -->
+        <!-- ===== MULTIPLE MEDIA (GALLERY) ===== -->
         {% elif media_list|length > 1 %}
         <div class="media-gallery" id="gallery-{{ post.id }}">
           <div class="gallery-track">
             {% for media in media_list %}
             <div class="gallery-item">
-              <!-- IMAGE -->
               {% if media.file.resource_type == "image" %}
               <img
                 src="{{ media.file.url }}"
@@ -114,35 +112,31 @@
                 alt="Gallery image"
               />
 
-              <!-- VIDEO -->
               {% elif media.file.resource_type == "video" %}
-              <video controls muted>
+              <video controls muted class="js-media">
                 <source src="{{ media.file.url }}" />
               </video>
 
-              <!-- DOCUMENT -->
               {% else %}
               <div
                 class="doc-slide"
                 data-src="{{ media.file.url }}"
-                data-name="{{ media.file.public_id|truncatechars:26 }}"
+                data-name="{{ media.file.public_id }}"
               >
                 <div class="doc-big-icon">📄</div>
                 <div class="doc-name">
                   {{ media.file.public_id|truncatechars:26 }}
                 </div>
-                <div class="doc-open">Open / Download</div>
+                Open / Download
               </div>
               {% endif %}
             </div>
             {% endfor %}
           </div>
 
-          <!-- GALLERY CONTROLS -->
-          <button class="gallery-prev" aria-label="Previous">‹</button>
-          <button class="gallery-next" aria-label="Next">›</button>
+          <button class="gallery-prev">‹</button>
+          <button class="gallery-next">›</button>
 
-          <!-- DOTS -->
           <div class="gallery-dots">
             {% for media in media_list %}
             <span class="{% if forloop.first %}active{% endif %}"></span>
@@ -151,7 +145,7 @@
         </div>
         {% endif %} {% endwith %}
 
-        <!-- ---------- OWNER CONTROLS ---------- -->
+        <!-- OWNER CONTROLS -->
         {% if user == post.author %}
         <div class="post-controls">
           <a href="{% url 'edit_post' post.id %}" class="edit-btn">Edit</a>
@@ -161,9 +155,9 @@
         </div>
         {% endif %}
 
-        <!-- ---------- ACTION BAR ---------- -->
+        <!-- ACTION BAR -->
         <div class="post-actions">
-          <!-- VOTING -->
+          <!-- VOTES -->
           <div class="vote-box">
             {% if user.is_authenticated %}
             <button
@@ -209,36 +203,26 @@
     </div>
 
     <!-- ==================================================
-     LIGHTBOX (FULL FEATURED – IMAGE / VIDEO / DOCUMENT)
-================================================== -->
+       LIGHTBOX (IMAGE / VIDEO / DOCUMENT)
+  ================================================== -->
     <div id="lightbox" class="lightbox hidden">
-      <!-- CLOSE -->
       <span id="lightbox-close" class="lightbox-close">×</span>
 
-      <!-- NAVIGATION -->
       <button id="lightbox-prev" class="lightbox-nav">‹</button>
       <button id="lightbox-next" class="lightbox-nav">›</button>
 
-      <!-- CONTENT -->
       <div class="lightbox-content">
         <!-- IMAGE -->
-        <img id="lightbox-img" alt="Lightbox image" class="" />
+        <img id="lightbox-img" alt="Lightbox image" />
 
         <!-- VIDEO -->
-        <video id="lightbox-video" controls preload="metadata">
-          <source />
-        </video>
+        <video id="lightbox-video" controls preload="metadata"></video>
 
         <!-- DOCUMENT -->
         <div id="lightbox-doc" class="doc-lightbox-box hidden">
           <div class="doc-preview">
-            <!-- BIG DOCUMENT ICON -->
             <div class="doc-big-icon">📄</div>
-
-            <!-- DOCUMENT NAME -->
             <div id="doc-name" class="doc-title"></div>
-
-            <!-- DOWNLOAD / OPEN -->
             <a
               id="doc-download"
               class="doc-download-btn"
@@ -253,7 +237,7 @@
       </div>
     </div>
 
-    <!-- ================= SCRIPTS ================= -->
+    <!-- SCRIPT -->
     <script src="{% static 'posts/js/home.js' %}"></script>
   </body>
 </html>
