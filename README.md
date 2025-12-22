@@ -29,7 +29,7 @@ The platform is aimed at users who enjoy sharing short-form content and engaging
 - Media uploads improve engagement and content richness.
 - The interface is simple and intuitive.
 
-![Create Post](crow/docs/images/create-post.png.png)
+![Create Post](crow/docs/images/create-post.png)
 
 #### 🖼️ Media Feed
 - All posts are displayed in a central feed.
@@ -180,6 +180,7 @@ crow/
 - Images and videos used for testing are user-generated or from open-source resources.
 
 ### Tools
+- railway.com (https://railway.com/invite/3bdUR9J-jRD)
 - Visual Studio Code
 - GitHub
 - Cloudinary
