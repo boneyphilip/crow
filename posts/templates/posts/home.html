@@ -1,13 +1,16 @@
 {% load static %} {% load humanize %} {% load time_filters %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Crow — Home Feed</title>
 
+    <!-- NAVBAR + HOME STYLES -->
     <link rel="stylesheet" href="{% static 'posts/css/navbar.css' %}" />
     <link rel="stylesheet" href="{% static 'posts/css/home.css' %}" />
 
+    <!-- FONT -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       rel="stylesheet"
@@ -15,25 +18,32 @@
   </head>
 
   <body>
-    {% include 'posts/navbar.html' %}
+    <!-- NAVBAR -->
+    {% include "posts/navbar.html" %}
 
+    <!-- ================= FEED WRAPPER ================= -->
     <div class="feed-wrapper">
+      <!-- FLASH MESSAGES -->
       {% if messages %} {% for message in messages %}
       <div class="flash-message">{{ message }}</div>
-      {% endfor %} {% endif %} {% for post in posts %}
+      {% endfor %} {% endif %}
+
+      <!-- ================= POSTS LOOP ================= -->
+      {% for post in posts %}
       <div class="post-card" data-post-id="{{ post.id }}">
-        <!-- HEADER -->
+        <!-- ---------- POST HEADER ---------- -->
         <div class="post-header">
           <img
             class="post-avatar"
             src="https://ui-avatars.com/api/?name={{ post.author.username }}"
+            alt="{{ post.author.username }}"
           />
 
           <div class="post-meta">
             <span class="post-author">{{ post.author.username }}</span>
-            <span class="post-time"
-              >• {{ post.created_at|naturaltime|clean_time }}</span
-            >
+            <span class="post-time">
+              • {{ post.created_at|naturaltime|clean_time }}
+            </span>
 
             {% if post.category %}
             <span class="post-category">{{ post.category.name }}</span>
@@ -41,72 +51,81 @@
           </div>
         </div>
 
-        <!-- TITLE -->
+        <!-- ---------- TITLE ---------- -->
         <h2 class="post-title">{{ post.title }}</h2>
 
-        <!-- SUMMARY -->
+        <!-- ---------- CONTENT ---------- -->
         <p class="post-content">{{ post.content|truncatechars:250 }}</p>
 
-        <!-- MEDIA HANDLING -->
-        {% if post.media.count == 1 %} {% with m=post.media.first %}
+        <!-- ==================================================
+             MEDIA HANDLING (SINGLE / MULTI)
+        ================================================== -->
+        {% with media_list=post.media.all %}
 
+        <!-- ===== SINGLE MEDIA ===== -->
+        {% if media_list|length == 1 %} {% with m=media_list.0 %}
         <div class="media-single">
-          {% if m.is_image %}
-          <img src="{{ m.file.url }}" class="media-single-img" />
+          <!-- IMAGE -->
+          {% if m.file.resource_type == "image" %}
+          <img
+            src="{{ m.file.url }}"
+            class="media-single-img"
+            alt="Post image"
+          />
 
-          {% elif m.is_video %}
+          <!-- VIDEO -->
+          {% elif m.file.resource_type == "video" %}
           <video controls class="media-single-video">
-            <source src="{{ m.file.url }}" type="video/mp4" />
+            <source src="{{ m.file.url }}" />
           </video>
 
+          <!-- DOCUMENT -->
           {% else %}
-          <!-- SINGLE DOCUMENT CARD -->
           <div
             class="doc-attachment"
             data-src="{{ m.file.url }}"
-            data-name="{{ m.file.name }}"
+            data-name="{{ m.file.public_id|truncatechars:45 }}"
           >
             <div class="doc-attachment-inner">
               <div class="doc-file-icon">📄</div>
               <div class="doc-file-info">
                 <div class="doc-file-name">
-                  {{ m.file.name|truncatechars:45 }}
+                  {{ m.file.public_id|truncatechars:45 }}
                 </div>
                 <div class="doc-file-meta">Click to view / download</div>
               </div>
             </div>
           </div>
-
           {% endif %}
         </div>
+        {% endwith %}
 
-        {% endwith %} {% elif post.media.count > 1 %}
-
-        <!-- REDDIT STYLE GALLERY -->
-        <div
-          class="media-gallery"
-          id="gallery-{{ post.id }}"
-          data-post-id="{{ post.id }}"
-        >
+        <!-- ===== MULTI MEDIA GALLERY ===== -->
+        {% elif media_list|length > 1 %}
+        <div class="media-gallery" id="gallery-{{ post.id }}">
           <div class="gallery-track">
-            {% for media in post.media.all %}
+            {% for media in media_list %}
             <div class="gallery-item">
-              {% if media.is_image %}
-              <img src="{{ media.file.url }}" />
+              <!-- IMAGE -->
+              {% if media.file.resource_type == "image" %}
+              <img src="{{ media.file.url }}" alt="Gallery image" />
 
-              {% elif media.is_video %}
+              <!-- VIDEO -->
+              {% elif media.file.resource_type == "video" %}
               <video controls muted>
-                <source src="{{ media.file.url }}" type="video/mp4" />
+                <source src="{{ media.file.url }}" />
               </video>
+
+              <!-- DOCUMENT -->
               {% else %}
               <div
                 class="doc-slide"
                 data-src="{{ media.file.url }}"
-                data-name="{{ media.file.name|truncatechars:26 }}"
+                data-name="{{ media.file.public_id|truncatechars:26 }}"
               >
                 <div class="doc-big-icon">📄</div>
                 <div class="doc-name">
-                  {{ media.file.name|truncatechars:26 }}
+                  {{ media.file.public_id|truncatechars:26 }}
                 </div>
                 <div class="doc-open">Open / Download</div>
               </div>
@@ -115,18 +134,20 @@
             {% endfor %}
           </div>
 
-          <button class="gallery-prev" data-id="{{ post.id }}">‹</button>
-          <button class="gallery-next" data-id="{{ post.id }}">›</button>
+          <!-- GALLERY CONTROLS -->
+          <button class="gallery-prev" aria-label="Previous">‹</button>
+          <button class="gallery-next" aria-label="Next">›</button>
 
+          <!-- DOTS -->
           <div class="gallery-dots">
-            {% for media in post.media.all %}
+            {% for media in media_list %}
             <span class="{% if forloop.first %}active{% endif %}"></span>
             {% endfor %}
           </div>
         </div>
-        {% endif %}
+        {% endif %} {% endwith %}
 
-        <!-- OWNER CONTROLS -->
+        <!-- ---------- OWNER CONTROLS ---------- -->
         {% if user == post.author %}
         <div class="post-controls">
           <a href="{% url 'edit_post' post.id %}" class="edit-btn">Edit</a>
@@ -136,12 +157,13 @@
         </div>
         {% endif %}
 
-        <!-- ACTION BAR -->
+        <!-- ---------- ACTION BAR ---------- -->
         <div class="post-actions">
+          <!-- VOTING -->
           <div class="vote-box">
             {% if user.is_authenticated %}
             <button
-              class="vote-btn upvote {% if post.user_vote_value == 1 %}active{% endif %}"
+              class="vote-btn upvote"
               data-post-id="{{ post.id }}"
               data-action="upvote"
             >
@@ -157,7 +179,7 @@
 
             {% if user.is_authenticated %}
             <button
-              class="vote-btn downvote {% if post.user_vote_value == -1 %}active{% endif %}"
+              class="vote-btn downvote"
               data-post-id="{{ post.id }}"
               data-action="downvote"
             >
@@ -168,9 +190,12 @@
             {% endif %}
           </div>
 
-          <a href="{% url 'post_detail' post.id %}" class="action-btn"
-            >💬 {{ post.comments.count }} Comments</a
-          >
+          <!-- COMMENTS -->
+          <a href="{% url 'post_detail' post.id %}" class="action-btn">
+            💬 {{ post.comments.count }} Comments
+          </a>
+
+          <!-- SHARE -->
           <div class="action-btn share-btn">↗ Share</div>
         </div>
       </div>
@@ -179,25 +204,35 @@
       {% endfor %}
     </div>
 
-    <!-- LIGHTBOX OVERLAY -->
+    <!-- ==================================================
+         LIGHTBOX (FULL FEATURED)
+    ================================================== -->
     <div id="lightbox" class="lightbox hidden">
+      <!-- CLOSE -->
       <span id="lightbox-close" class="lightbox-close">×</span>
 
+      <!-- NAV -->
       <button id="lightbox-prev" class="lightbox-nav">‹</button>
       <button id="lightbox-next" class="lightbox-nav">›</button>
 
+      <!-- CONTENT -->
       <div class="lightbox-content">
-        <img id="lightbox-img" class="hidden" />
-        <video id="lightbox-video" controls class="hidden"></video>
-        <div id="lightbox-doc" class="hidden doc-lightbox-box">
+        <!-- IMAGE -->
+        <img id="lightbox-img" alt="Lightbox image" />
+
+        <!-- VIDEO -->
+        <video id="lightbox-video" controls></video>
+
+        <!-- DOCUMENT -->
+        <div id="lightbox-doc" class="doc-lightbox-box hidden">
           <div class="doc-preview">
             <div class="doc-big-icon">📄</div>
             <div id="doc-name" class="doc-title"></div>
             <a
               id="doc-download"
+              class="doc-download-btn"
               href="#"
               target="_blank"
-              class="doc-download-btn"
             >
               Open / Download
             </a>
@@ -206,6 +241,7 @@
       </div>
     </div>
 
+    <!-- ================= SCRIPTS ================= -->
     <script src="{% static 'posts/js/home.js' %}"></script>
   </body>
 </html>

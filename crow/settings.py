@@ -2,8 +2,10 @@
 Django settings for crow project.
 
 Deployment-ready settings:
-- Uses environment variables for SECRET_KEY, DEBUG, ALLOWED_HOSTS, DATABASE_URL
-- Uses WhiteNoise for static files
+- Environment variables (.env)
+- WhiteNoise for static files
+- Cloudinary for media storage
+- Local SQLite + Railway/Postgres support
 """
 
 from pathlib import Path
@@ -12,11 +14,22 @@ import os
 import dj_database_url
 from dotenv import load_dotenv
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+# ==========================================================
+# LOAD ENVIRONMENT VARIABLES
+# ==========================================================
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ==========================================================
+# CORE SETTINGS
+# ==========================================================
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-me")
+
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
 allowed_hosts_raw = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost")
@@ -27,6 +40,9 @@ CSRF_TRUSTED_ORIGINS = [u.strip() for u in csrf_raw.split(",") if u.strip()]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# ==========================================================
+# APPLICATIONS
+# ==========================================================
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -36,14 +52,18 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
 
+    # Cloudinary
     "cloudinary",
     "cloudinary_storage",
 
+    # Local apps
     "posts",
     "accounts",
 ]
 
-
+# ==========================================================
+# MIDDLEWARE
+# ==========================================================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -55,6 +75,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# ==========================================================
+# URLS / TEMPLATES
+# ==========================================================
 ROOT_URLCONF = "crow.urls"
 
 TEMPLATES = [
@@ -74,13 +97,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "crow.wsgi.application"
 
-# =========================
+# ==========================================================
 # DATABASE
-# =========================
+# ==========================================================
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 if DATABASE_URL:
-    # Railway / Production (Postgres)
+    # Railway / Production (PostgreSQL)
     DATABASES = {
         "default": dj_database_url.parse(
             DATABASE_URL,
@@ -89,7 +112,7 @@ if DATABASE_URL:
         )
     }
 else:
-    # Local Dev (SQLite)
+    # Local development (SQLite)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -97,7 +120,9 @@ else:
         }
     }
 
-
+# ==========================================================
+# PASSWORD VALIDATION
+# ==========================================================
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
@@ -125,30 +150,35 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# ==========================================================
+# INTERNATIONALIZATION
+# ==========================================================
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# ==========================================================
+# STATIC FILES (WHITENOISE)
+# ==========================================================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
-    # Default storage for uploaded media files (images/videos/docs)
+    # Media files → Cloudinary
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
 
-    # Static files storage (WhiteNoise for deployment)
+    # Static files → WhiteNoise
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
-
-# MEDIA_URL = "/media/"
-# MEDIA_ROOT = BASE_DIR / "media"
-
+# ==========================================================
+# DEFAULT PRIMARY KEY
+# ==========================================================
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ==========================================================
@@ -158,14 +188,17 @@ LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 LOGIN_URL = "login"
 
-# ===============================
-# CLOUDINARY CONFIG
-# ===============================
+# ==========================================================
+# CLOUDINARY CONFIGURATION (CRITICAL)
+# ==========================================================
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
 
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
     "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
     "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
 }
-
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
