@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum
+from cloudinary.models import CloudinaryField
 
 
 # -----------------------------
@@ -140,21 +141,24 @@ class PostMedia(models.Model):
         on_delete=models.CASCADE,
         related_name="media",
     )
-    file = models.FileField(upload_to="post_media/")
+
+    file = CloudinaryField(
+        "media",
+        resource_type="auto",
+        blank=True,
+        null=True,
+    )
+
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def is_image(self) -> bool:
-        return self.file.name.lower().endswith(
-            (".png", ".jpg", ".jpeg", ".gif", ".webp")
-        )
+        return self.file and self.file.resource_type == "image"
 
     def is_video(self) -> bool:
-        return self.file.name.lower().endswith(
-            (".mp4", ".mov", ".avi", ".mkv")
-        )
+        return self.file and self.file.resource_type == "video"
 
     def is_document(self) -> bool:
-        return not (self.is_image() or self.is_video())
+        return self.file and self.file.resource_type == "raw"
 
     def __str__(self) -> str:
-        return str(self.file.name)
+        return str(self.file)
