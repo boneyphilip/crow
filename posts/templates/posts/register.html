@@ -15,6 +15,13 @@
       <div class="auth-card">
         <h2>Create Account</h2>
 
+        {% if form.errors %}
+        <div class="auth-errors">
+          <p class="auth-errors-title">Please fix these:</p>
+          {{ form.errors }}
+        </div>
+        {% endif %}
+
         <form method="POST">
           {% csrf_token %}
 

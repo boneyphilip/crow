@@ -34,9 +34,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "posts",
     "accounts",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -68,7 +70,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "crow.wsgi.application"
 
-default_db = "postgresql://postgres:postgres@localhost:5432/crow_db"
+default_db = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+
 DATABASES = {
     "default": dj_database_url.config(
         default=os.getenv("DATABASE_URL", default_db),
@@ -76,6 +79,7 @@ DATABASES = {
         ssl_require=not DEBUG,
     )
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -113,14 +117,26 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
+    # Default storage for uploaded media files (images/videos/docs)
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+
+    # Static files storage (WhiteNoise for deployment)
     "staticfiles": {
-        "BACKEND": (
-            "whitenoise.storage.CompressedManifestStaticFilesStorage"
-        ),
-    }
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
 }
+
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ==========================================================
+# AUTH REDIRECTS
+# ==========================================================
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
+LOGIN_URL = "login"

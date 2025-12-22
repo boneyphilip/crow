@@ -37,13 +37,22 @@ body {
   font-weight: 600;
 }
 
-.auth-group input {
+.auth-group input,
+.auth-group select,
+.auth-group textarea {
   width: 100%;
   padding: 12px;
   border-radius: 6px;
   border: 1px solid #ccc;
   margin-top: 6px;
   font-size: 15px;
+  box-sizing: border-box;
+}
+
+/* Django form fields (like {{ form.username }}) are inputs too */
+.auth-group input[type="text"],
+.auth-group input[type="password"] {
+  box-sizing: border-box;
 }
 
 .auth-btn {
@@ -70,4 +79,38 @@ body {
 .auth-footer a {
   color: #0073ff;
   text-decoration: none;
+}
+
+/* ==========================================================
+   ERROR UI FIX (NO BULLETS, CLEAN ALIGNMENT)
+========================================================== */
+.auth-errors {
+  background: #ffe6e6;
+  border: 1px solid #ff9999;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin: 12px 0 16px 0;
+  font-size: 14px;
+  text-align: left;
+}
+
+.auth-errors-title {
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.auth-error-item {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+/* Remove Django default ul/li bullets inside errors */
+.auth-errors ul {
+  margin: 8px 0 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.auth-errors li {
+  margin: 6px 0;
 }
