@@ -11,7 +11,7 @@ Crow is a modern social feed platform that allows users to create, share, and in
 
 The platform is aimed at users who enjoy sharing short-form content and engaging with a community. Crow provides a solid foundation for a scalable social application with potential for future expansion.
 
-![Responsive Mockup](docs/images/responsive-mockup.png)
+![Responsive Mockup](crow/docs/images/resp.png)
 
 ---
 
@@ -29,14 +29,14 @@ The platform is aimed at users who enjoy sharing short-form content and engaging
 - Media uploads improve engagement and content richness.
 - The interface is simple and intuitive.
 
-![Create Post](docs/images/create-post.png)
+![Create Post](crow/docs/images/create-post.png.png)
 
 #### 🖼️ Media Feed
 - All posts are displayed in a central feed.
 - Users can view images and videos directly within posts.
 - Clean layout ensures easy content consumption.
 
-![Home Feed](docs/images/home-feed.png)
+![Home Feed](crow/docs/images/home-feed.png)
 
 #### 💬 User Interaction
 - Users can like or react to posts.
@@ -48,7 +48,7 @@ The platform is aimed at users who enjoy sharing short-form content and engaging
 - Layout adapts smoothly to different screen sizes.
 - Ensures accessibility on all devices.
 
-![Responsive View](docs/images/responsive-mockup.png)
+![Responsive View](crow/docs/images/responsive-mockup.png)
 
 #### 🧭 Navigation
 - Consistent navigation bar across all pages.
@@ -56,6 +56,7 @@ The platform is aimed at users who enjoy sharing short-form content and engaging
 - Improves overall user experience.
 
 ---
+![Responsive View](crow/docs/images/responsive-mockup2.png)
 
 ### 🔮 Features Left to Implement
 
@@ -115,7 +116,7 @@ The project was deployed using an online hosting platform.
 5. Save the changes and wait for deployment confirmation.
 
 🔗 **Live Site:**  
-`https://your-live-link-here`
+`[https://your-live-link-here](https://web-production-0574.up.railway.app/)`
 
 ---
 
