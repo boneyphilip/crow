@@ -210,8 +210,9 @@ document.addEventListener("DOMContentLoaded", () => {
   ========================================================== */
   document.addEventListener("click", (e) => {
     const mediaEl = e.target.closest(
-      ".media-single-img, .media-single-video, .doc-attachment, .gallery-item img, .gallery-item video, .doc-slide"
+      ".js-media, .media-single-video, .doc-attachment, .doc-slide"
     );
+
     if (!mediaEl) return;
 
     e.preventDefault();

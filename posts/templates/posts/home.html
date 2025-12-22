@@ -69,7 +69,7 @@
           {% if m.file.resource_type == "image" %}
           <img
             src="{{ m.file.url }}"
-            class="media-single-img"
+            class="media-single-img js-media"
             alt="Post image"
           />
 
@@ -108,7 +108,11 @@
             <div class="gallery-item">
               <!-- IMAGE -->
               {% if media.file.resource_type == "image" %}
-              <img src="{{ media.file.url }}" alt="Gallery image" />
+              <img
+                src="{{ media.file.url }}"
+                class="js-media"
+                alt="Gallery image"
+              />
 
               <!-- VIDEO -->
               {% elif media.file.resource_type == "video" %}
