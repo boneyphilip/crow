@@ -70,11 +70,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "crow.wsgi.application"
 
-default_db = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
-
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL", default_db),
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
         ssl_require=not DEBUG,
     )
@@ -113,7 +111,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
