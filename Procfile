@@ -1,1 +1,2 @@
-web: gunicorn crow.wsgi
+web: gunicorn crow.wsgi:application
+
