@@ -116,7 +116,7 @@ The project was deployed using an online hosting platform.
 5. Save the changes and wait for deployment confirmation.
 
 🔗 **Live Site:**  
-`[https://your-live-link-here](https://web-production-0574.up.railway.app/)`
+`https://web-production-0574.up.railway.app/`
 
 ---
 
